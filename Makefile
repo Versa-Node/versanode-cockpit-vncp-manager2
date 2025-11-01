@@ -208,10 +208,10 @@ bots: $(COCKPIT_REPO_STAMP)
 test/reference: test/common
 	test/common/pixel-tests pull
 
-# We want tools/node-modules to run every time package-lock.json is requested
-# See https://www.gnu.org/software/make/manual/html_node/Force-Targets.html
+# Use npm to ensure dependencies are installed (simplified for Docker version)
+# We use npm install instead of the complex tools/node-modules submodule system
 FORCE:
-$(NODE_MODULES_TEST): FORCE tools/node-modules
-	tools/node-modules make_package_lock_json
+$(NODE_MODULES_TEST): FORCE package.json
+	npm install
 
 .PHONY: all clean install devel-install devel-uninstall print-version dist rpm prepare-check check vm print-vm
