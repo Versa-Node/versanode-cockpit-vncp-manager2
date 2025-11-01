@@ -19,10 +19,10 @@
 /cockpit-*.tar.xz
 /cockpit-docker.spec
 /dist/
-/package-lock.json
-/pkg/
+# /package-lock.json  # Allow committing for Docker version
+# /pkg/              # Allow committing build infrastructure
 /tmp/
-/tools/
+# /tools/            # Allow committing build tools
  
 # subdirs (/subdir/...)
 /packaging/arch/PKGBUILD
