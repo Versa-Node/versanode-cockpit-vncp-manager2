@@ -82,11 +82,7 @@ export class ImageRunModal extends React.Component {
             selectedImage = utils.image_name(this.props.image);
         }
 
-        const default_owner = this.props.pod
-            ? this.props.users.find(u => u.uid === this.props.pod.uid)
-            : (this.props.image
-                ? this.props.users.find(u => u.uid === this.props.image.uid)
-                : this.props.users[0]);
+        // Simplified: no user/owner system like working repository
 
         this.state = {
             command,
@@ -108,7 +104,7 @@ export class ImageRunModal extends React.Component {
             restartTries: 5,
             pullLatestImage: false,
             activeTabKey: 0,
-            owner: default_owner,
+            // No owner tracking - simplified like working repository
             /* image select */
             selectedImage,
             searchFinished: false,
@@ -234,17 +230,17 @@ export class ImageRunModal extends React.Component {
         return createConfig;
     }
 
-    createContainer = (con, createConfig, runImage) => {
+    createContainer = (createConfig, runImage) => {
         const Dialogs = this.props.dialogs;
-        client.createContainer(con, createConfig)
+        client.createContainer(createConfig)
                 .then(reply => {
                     if (runImage) {
-                        client.postContainer(con, "start", reply.Id, {})
+                        client.postContainer("start", reply.Id, {})
                                 .then(() => Dialogs.close())
                                 .catch(ex => {
                                     // If container failed to start remove it, so a user can fix the settings and retry and
                                     // won't get another error that the container name is already taken.
-                                    client.delContainer(con, reply.Id, true)
+                                    client.delContainer(reply.Id, true)
                                             .then(() => {
                                                 this.setState({
                                                     inProgress: false,
@@ -282,25 +278,23 @@ export class ImageRunModal extends React.Component {
         const Dialogs = this.props.dialogs;
         const createConfig = this.getCreateConfig();
         const { pullLatestImage } = this.state;
-        const con = this.state.owner.con;
         let imageExists = true;
 
         try {
-            await client.imageExists(con, createConfig.image);
+            await client.imageExists(createConfig.image);
         } catch {
             imageExists = false;
         }
 
         if (imageExists && !pullLatestImage) {
-            this.createContainer(con, createConfig, runImage);
+            this.createContainer(createConfig, runImage);
         } else {
             Dialogs.close();
             const tempImage = { ...createConfig };
 
             // Assign temporary properties to allow rendering
             tempImage.Id = tempImage.name;
-            tempImage.uid = con.uid;
-            tempImage.key = utils.makeKey(tempImage.uid, tempImage.Id);
+            tempImage.key = utils.makeKey(tempImage.Id);
             tempImage.State = { Status: _("downloading") };
             tempImage.Created = new Date();
             tempImage.Name = tempImage.name;
@@ -309,11 +303,11 @@ export class ImageRunModal extends React.Component {
 
             onDownloadContainer(tempImage);
 
-            client.pullImage(con, createConfig.image).then(_reply => {
-                client.createContainer(con, createConfig)
+            client.pullImage(createConfig.image).then(_reply => {
+                client.createContainer(createConfig)
                         .then(reply => {
                             if (runImage) {
-                                client.postContainer(con, "start", reply.Id, {})
+                                client.postContainer("start", reply.Id, {})
                                         .then(() => onDownloadContainerFinished(createConfig))
                                         .catch(ex => {
                                             onDownloadContainerFinished(createConfig);
@@ -415,7 +409,8 @@ export class ImageRunModal extends React.Component {
             this.activeConnection.close();
 
         this.setState({ searchFinished: false, searchInProgress: true });
-        this.activeConnection = rest.connect(this.isSystem() ? 0 : null);
+        // Simplified: always use system-level connection
+        this.activeConnection = rest.connect();
         const searches = [];
 
         // Try to get specified image manifest
@@ -568,16 +563,13 @@ export class ImageRunModal extends React.Component {
 
     debouncedInputChanged = debounce(300, this.handleImageSelectInput);
 
-    handleOwnerSelect = event => this.setState({
-        owner: this.props.users.find(u => u.name == event.currentTarget.value)
-    });
-
     filterImages = () => {
         const { localImages } = this.props;
         const { imageResults, searchText } = this.state;
         const local = _("Local images");
         const images = { ...imageResults };
-        const isSystem = this.isSystem();
+        // Simplified: always treat as system
+        const isSystem = true;
 
         let imageRegistries = [];
         if (this.state.searchByRegistry == 'local' || this.state.searchByRegistry == 'all') {
@@ -634,17 +626,14 @@ export class ImageRunModal extends React.Component {
 
     enableDockerRestartService = () => {
         const argv = ["systemctl", "enable", "docker-restart.service"];
-        if (!this.isSystem()) {
-            argv.splice(1, 0, "--user");
-        }
-
-        cockpit.spawn(argv, { superuser: this.isSystem() ? "require" : "", err: "message" })
+        // Simplified: always system operations
+        cockpit.spawn(argv, { superuser: "require", err: "message" })
                 .catch(err => {
                     console.warn("Failed to start docker-restart.service:", JSON.stringify(err));
                 });
     };
 
-    isSystem = () => this.state.owner.uid === 0;
+    // Removed isSystem method - not needed in simplified architecture
 
     isFormInvalid = validationFailed => {
         function checkGroup(validation, values) {
@@ -671,7 +660,7 @@ export class ImageRunModal extends React.Component {
 
     async validateContainerName(containerName) {
         try {
-            await client.containerExists(this.state.owner.con, containerName);
+            await client.containerExists(containerName);
         } catch {
             return;
         }
@@ -752,7 +741,7 @@ export class ImageRunModal extends React.Component {
         const { registries, userLingeringEnabled, userDockerRestartAvailable, selinuxAvailable, version } = this.props.dockerInfo;
         const { image } = this.props;
         const dialogValues = this.state;
-        const { activeTabKey, owner, selectedImage } = this.state;
+        const { activeTabKey, selectedImage } = this.state;
 
         let imageListOptions = [];
         if (!image) {
@@ -826,57 +815,7 @@ export class ImageRunModal extends React.Component {
                 <Tabs activeKey={activeTabKey} onSelect={this.handleTabClick}>
                     <Tab eventKey={0} title={<TabTitleText>{_("Details")}</TabTitleText>}>
                         <FormSection className="pf-m-horizontal">
-                            {this.props.users.length > 1 &&
-                                <FormGroup isInline hasNoPaddingTop fieldId='run-image-dialog-owner' label={_("Owner")}
-                                    labelHelp={
-                                        <Popover aria-label={_("Owner help")}
-                                            enableFlip
-                                            bodyContent={
-                                                <>
-                                                    <Content>
-                                                        <Content component={ContentVariants.h4}>{_("System")}</Content>
-                                                        <Content component="ul">
-                                                            <Content component="li">
-                                                                {_("Ideal for running services")}
-                                                            </Content>
-                                                            <Content component="li">
-                                                                {_("Resource limits can be set")}
-                                                            </Content>
-                                                            <Content component="li">
-                                                                {_("Checkpoint and restore support")}
-                                                            </Content>
-                                                            <Content component="li">
-                                                                {_("Ports under 1024 can be mapped")}
-                                                            </Content>
-                                                        </Content>
-                                                    </Content>
-                                                    <Content>
-                                                        <Content component={ContentVariants.h4}>{_("User")}</Content>
-                                                        <Content component="ul">
-                                                            <Content component="li">
-                                                                {_("Ideal for development")}
-                                                            </Content>
-                                                            <Content component="li">
-                                                                {_("Restricted by user account permissions")}
-                                                            </Content>
-                                                        </Content>
-                                                    </Content>
-                                                </>
-                                            }>
-                                            <Button variant="plain" hasNoPadding aria-label="More info" icon={<OutlinedQuestionCircleIcon />} />
-                                        </Popover>
-                                    }>
-                                    {this.props.users.map(user => (
-                                        <Radio key={user.name}
-                                            value={user.name}
-                                            label={user.uid === 0 ? _("System") : cockpit.format("$0 $1", _("User:"), user.name)}
-                                            id={"run-image-dialog-owner-" + user.name}
-                                            isChecked={owner === user}
-                                            isDisabled={this.props.pod}
-                                            onChange={this.handleOwnerSelect} />))
-                                    }
-                                </FormGroup>
-                            }
+
                             <FormGroup fieldId="create-image-image-select-typeahead" label={_("Image")}
                                 labelHelp={!this.props.image &&
                                     <Popover aria-label={_("Image selection help")}
@@ -966,7 +905,7 @@ export class ImageRunModal extends React.Component {
                                 </Flex>
                             </FormGroup>
 
-                            {this.isSystem() &&
+                            {true &&
                                 <FormGroup
                                     fieldId='run-image-cpu-priority'
                                     label={_("CPU shares")}
@@ -996,7 +935,7 @@ export class ImageRunModal extends React.Component {
                                     </Flex>
                                 </FormGroup>
                             }
-                            {((userLingeringEnabled && userDockerRestartAvailable) || (this.isSystem())) &&
+                            {((userLingeringEnabled && userDockerRestartAvailable) || true) &&
                                 <Grid hasGutter md={6} sm={3}>
                                     <GridItem>
                                         <FormGroup fieldId='run-image-dialog-restart-policy' label={_("Restart policy")}

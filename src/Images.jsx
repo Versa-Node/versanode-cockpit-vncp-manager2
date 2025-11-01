@@ -45,13 +45,13 @@ class Images extends React.Component {
         this.renderRow = this.renderRow.bind(this);
     }
 
-    downloadImage(imageName, imageTag, con) {
+    downloadImage(imageName, imageTag) {
         let pullImageId = imageName;
         if (imageTag)
             pullImageId += ":" + imageTag;
 
         this.setState(previous => ({ imageDownloadInProgress: [...previous.imageDownloadInProgress, imageName] }));
-        client.pullImage(con, pullImageId)
+        client.pullImage(pullImageId)
                 .then(() => {
                     this.setState(previous => ({ imageDownloadInProgress: previous.imageDownloadInProgress.filter((image) => image != imageName) }));
                 })
@@ -69,7 +69,7 @@ class Images extends React.Component {
 
     onOpenNewImagesDialog = () => {
         const Dialogs = this.context;
-        Dialogs.show(<ImageSearchModal downloadImage={this.downloadImage} users={this.props.users} />);
+        Dialogs.show(<ImageSearchModal downloadImage={this.downloadImage} />);
     };
 
     _con_for = image => this.props.users.find(u => u.uid === image.uid).con;
@@ -77,7 +77,7 @@ class Images extends React.Component {
     onPullAllImages = () => Object.values(this.props.images).forEach(image => {
         // ignore nameless (intermediate) images and the localhost/ pseudo-registry (which cannot be pulled)
         if (image.RepoTags?.find(tag => !tag.startsWith("localhost/")))
-            this.downloadImage(image.RepoTags[0], null, this._con_for(image));
+            this.downloadImage(image.RepoTags[0], null);
         else
             utils.debug("onPullAllImages: ignoring image", image);
     });
@@ -418,7 +418,7 @@ const ImageActions = ({ con, image, onAddNotification, users, downloadImage }) =
     };
 
     const pullImage = () => {
-        downloadImage(utils.image_name(image), null, con);
+        downloadImage(utils.image_name(image), null);
     };
 
     const removeImage = () => {

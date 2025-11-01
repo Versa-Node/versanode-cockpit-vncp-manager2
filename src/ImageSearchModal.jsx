@@ -7,7 +7,6 @@ import { FormSelect, FormSelectOption } from "@patternfly/react-core/dist/esm/co
 import {
     Modal, ModalBody, ModalFooter, ModalHeader
 } from '@patternfly/react-core/dist/esm/components/Modal';
-import { Radio } from "@patternfly/react-core/dist/esm/components/Radio";
 import { TextInput } from "@patternfly/react-core/dist/esm/components/TextInput";
 import { Flex } from "@patternfly/react-core/dist/esm/layouts/Flex";
 import { ExclamationCircleIcon } from '@patternfly/react-icons';
@@ -370,13 +369,12 @@ echo ""  # Empty README if not found
   }
 }
 
-export const ImageSearchModal = ({ downloadImage, users }) => {
+export const ImageSearchModal = ({ downloadImage }) => {
     const [searchInProgress, setSearchInProgress] = useState(false);
     const [searchFinished, setSearchFinished] = useState(false);
     const [imageIdentifier, setImageIdentifier] = useState('');
     const [imageList, setImageList] = useState([]);
     const [imageTag, setImageTag] = useState("");
-    const [user, setUser] = useState(users[0]);
     const [selectedRegistry, setSelectedRegistry] = useState("");
     const [selected, setSelected] = useState("");
     const [dialogError, setDialogError] = useState("");
@@ -395,9 +393,9 @@ export const ImageSearchModal = ({ downloadImage, users }) => {
     // can't use that so instead we pass the selected registry.
     const onSearchTriggered = (searchRegistry = "", forceSearch = false) => {
         // When search re-triggers close any existing active connection
-        activeConnection = rest.connect(user.uid);
         if (activeConnection)
             activeConnection.close();
+        activeConnection = rest.connect(client.getAddress());
         setSearchFinished(false);
 
         // Do not call the SearchImage API if the input string  is not at least 2 chars,
@@ -500,13 +498,12 @@ export const ImageSearchModal = ({ downloadImage, users }) => {
         }
     };
 
-    const onToggleUser = ev => setUser(users.find(u => u.name === ev.currentTarget.value));
     const onDownloadClicked = () => {
         const selectedImageName = imageList[selected].Name;
         if (activeConnection)
             activeConnection.close();
         Dialogs.close();
-        downloadImage(selectedImageName, imageTag, user.con);
+        downloadImage(selectedImageName, imageTag);
     };
 
     const handleClose = () => {
@@ -524,17 +521,6 @@ export const ImageSearchModal = ({ downloadImage, users }) => {
             <ModalBody>
                 <Form isHorizontal>
                     {dialogError && <ErrorNotification errorMessage={dialogError} errorDetail={dialogErrorDetail} />}
-                    { users.length > 1 &&
-                    <FormGroup id="as-user" label={_("Owner")} isInline>
-                        { users.map(u => (
-                            <Radio key={u.name}
-                                   value={u.name}
-                                   label={u.name}
-                                   id={"image-search-modal-owner-" + u.name}
-                                   onChange={onToggleUser}
-                                   isChecked={u === user} />))
-                        }
-                    </FormGroup>}
                     <Flex spaceItems={{ default: 'inlineFlex', modifier: 'spaceItemsXl' }}>
                         <FormGroup fieldId="search-image-dialog-name" label={_("Search for")}>
                             <TextInput id='search-image-dialog-name'

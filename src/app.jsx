@@ -267,6 +267,11 @@ class Application extends React.Component {
     handleContainerEvent(event, con) {
         const id = event.Actor.ID;
 
+        // Debug: log exec events
+        if (event.Action && event.Action.startsWith('exec')) {
+            console.debug('Handling exec event:', event.Action);
+        }
+
         switch (event.Action) {
         /* The following events do not need to trigger any state updates */
         case 'attach':
