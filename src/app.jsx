@@ -635,14 +635,29 @@ class Application extends React.Component {
         let con = null;
 
         try {
-            const start_args = [
-                ...(is_other_user ? ["runuser", "-u", username, "--"] : []),
-                "systemctl",
-                ...(system ? [] : ["--user"]),
-                "start", "docker.socket"
-            ];
+            // Try to start Docker service - try both .service and .socket
             const environ = is_other_user ? ["XDG_RUNTIME_DIR=/run/user/" + uid] : [];
-            await cockpit.spawn(start_args, { superuser: uid === null ? null : "require", err: "message", environ });
+            const spawn_options = { superuser: uid === null ? null : "require", err: "message", environ };
+            
+            try {
+                const service_args = [
+                    ...(is_other_user ? ["runuser", "-u", username, "--"] : []),
+                    "systemctl",
+                    ...(system ? [] : ["--user"]),
+                    "start", "docker.service"
+                ];
+                await cockpit.spawn(service_args, spawn_options);
+            } catch (service_error) {
+                // If docker.service fails, try docker.socket
+                console.debug("docker.service failed, trying docker.socket:", service_error);
+                const socket_args = [
+                    ...(is_other_user ? ["runuser", "-u", username, "--"] : []),
+                    "systemctl",
+                    ...(system ? [] : ["--user"]),
+                    "start", "docker.socket"
+                ];
+                await cockpit.spawn(socket_args, spawn_options);
+            }
             con = rest.connect(uid);
             const reply = await client.getInfo(con);
             this.setState(prevState => {

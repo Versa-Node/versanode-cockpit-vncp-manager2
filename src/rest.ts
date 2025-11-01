@@ -26,26 +26,28 @@ let call_id = 0;
 const NL = '\n'.charCodeAt(0); // always 10, but avoid magic constant
 const CR = '\r'.charCodeAt(0); // always 13, but avoid magic constant
 
-const PODMAN_SYSTEM_ADDRESS = "/run/docker/docker.sock";
+const DOCKER_SYSTEM_ADDRESS = "/var/run/docker.sock";
 
 export type Uid = number | null; // standard Unix UID or null for logged in session user
 
 // FIXME: export SuperuserMode in cockpit.d.ts, and use it here
 function getAddress(uid: Uid): { path: string, superuser?: cockpit.ChannelOptions["superuser"] } {
     if (uid === null) {
-        // FIXME: make this async and call cockpit.user()
+        // For user sessions, Docker typically runs as system service
+        // but we can try the user runtime directory first
         const xrd = sessionStorage.getItem('XDG_RUNTIME_DIR');
         if (xrd)
             return { path: xrd + "/docker/docker.sock" };
-        console.warn("$XDG_RUNTIME_DIR is not present. Cannot use user service.");
-        return { path: "" };
+        // Fall back to system socket
+        console.warn("$XDG_RUNTIME_DIR is not present. Using system Docker socket.");
+        return { path: DOCKER_SYSTEM_ADDRESS, superuser: "try" };
     }
 
     if (uid === 0)
-        return { path: PODMAN_SYSTEM_ADDRESS, superuser: "require" };
+        return { path: DOCKER_SYSTEM_ADDRESS, superuser: "require" };
 
     if (Number.isInteger(uid))
-        return { path: `/run/user/${uid}/docker/docker.sock`, superuser: "require" };
+        return { path: DOCKER_SYSTEM_ADDRESS, superuser: "require" };
 
     throw new Error(`getAddress: uid ${uid} not supported`);
 }

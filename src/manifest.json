@@ -1,10 +1,10 @@
 {
     "conditions": [
-        {"path-exists": "/lib/systemd/system/docker.socket"}
+        {"path-exists": "/var/run/docker.sock"}
     ],
     "menu": {
         "index": {
-            "label": "Docker containers",
+            "label": "VNCP Manager",
             "order": 50,
             "keywords": [
                 {
