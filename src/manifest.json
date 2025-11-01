@@ -1,6 +1,6 @@
 {
     "conditions": [
-        {"path-exists": "/var/run/docker.sock"}
+        {"path-exists": "/lib/systemd/system/docker.socket"}
     ],
     "menu": {
         "index": {

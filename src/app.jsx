@@ -235,32 +235,6 @@ class Application extends React.Component {
                 });
     }
 
-    updatePods(con) {
-        return client.getPods(con)
-                .then(reply => {
-                    this.setState(prevState => {
-                        // Copy only pods that could not be deleted with this event
-                        // So when event from one uid comes, only copy the other pods
-                        const copyPods = {};
-                        Object.entries(prevState.pods || {}).forEach(([id, pod]) => {
-                            if (pod.uid !== con.uid)
-                                copyPods[id] = pod;
-                        });
-                        for (const pod of reply || []) {
-                            pod.uid = con.uid;
-                            pod.key = makeKey(con.uid, pod.Id);
-                            copyPods[pod.key] = pod;
-                        }
-
-                        const users = prevState.users.map(u => u.uid === con.uid ? { ...u, podsLoaded: true } : u);
-                        return { pods: copyPods, users };
-                    });
-                })
-                .catch(ex => {
-                    console.warn("Failed to do updatePods for uid", con.uid, ":", JSON.stringify(ex));
-                });
-    }
-
     updateContainer(con, id, event) {
         /* when firing off multiple calls in parallel, docker can return them in a random order.
          * This messes up the state. So we need to serialize them for a particular container. */
@@ -294,22 +268,6 @@ class Application extends React.Component {
                 })
                 .catch(ex => {
                     console.warn("Failed to do updateImage for uid", con.uid, ":", JSON.stringify(ex));
-                });
-    }
-
-    updatePod(con, id) {
-        return client.getPods(con, id)
-                .then(reply => {
-                    if (reply && reply.length > 0) {
-                        const pod = reply[0];
-
-                        pod.uid = con.uid;
-                        pod.key = makeKey(con.uid, id);
-                        this.updateState("pods", pod.key, pod);
-                    }
-                })
-                .catch(ex => {
-                    console.warn("Failed to do updatePod for uid", con.uid, ":", JSON.stringify(ex));
                 });
     }
 

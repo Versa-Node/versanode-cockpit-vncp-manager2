@@ -26,7 +26,7 @@ let call_id = 0;
 const NL = '\n'.charCodeAt(0); // always 10, but avoid magic constant
 const CR = '\r'.charCodeAt(0); // always 13, but avoid magic constant
 
-const DOCKER_SYSTEM_ADDRESS = "/var/run/docker.sock";
+const DOCKER_SYSTEM_ADDRESS = "/lib/systemd/system/docker.socket";
 
 export type Uid = number | null; // standard Unix UID or null for logged in session user
 
