@@ -136,12 +136,14 @@ class Images extends React.Component {
         const tabs = [];
         const { title: usedByText, count: usedByCount } = this.getUsedByText(image);
 
-        const user = this.props.users.find(user => user.uid === image.uid);
-        cockpit.assert(user, `User not found for image uid ${image.uid}`);
+        // In simplified architecture, default to system user for images without UID
+        const imageUid = image.uid !== undefined ? image.uid : 0;
+        const user = this.props.users.find(user => user.uid === imageUid);
+        cockpit.assert(user, `User not found for image uid ${imageUid}`);
 
         const columns = [
             { title: utils.image_name(image), header: true, props: { modifier: "breakWord" } },
-            { title: (image.uid == 0) ? _("system") : <div><span className="ct-grey-text">{_("user:")} </span>{user.name}</div>, props: { className: "ignore-pixels", modifier: "nowrap" }, sortKey: user.name },
+            { title: (imageUid == 0) ? _("system") : <div><span className="ct-grey-text">{_("user:")} </span>{user.name}</div>, props: { className: "ignore-pixels", modifier: "nowrap" }, sortKey: user.name },
             { title: <utils.RelativeTime time={image.Created * 1000} />, props: { className: "image-created" }, sortKey: image.Created },
             { title: utils.truncate_id(image.Id), props: { className: "image-id" } },
             { title: cockpit.format_bytes(image.Size), props: { className: "ignore-pixels", modifier: "nowrap" }, sortKey: image.Size },

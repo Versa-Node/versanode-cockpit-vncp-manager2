@@ -427,13 +427,15 @@ class Containers extends React.Component {
                 state.push(<Badge key={healthcheck} isRead className={"ct-badge-container-" + healthcheck}>{localized_health}</Badge>);
         }
 
-        const user = this.props.users.find(user => user.uid === container.uid);
-        cockpit.assert(user, `User not found for container uid ${container.uid}`);
+        // In simplified architecture, default to system user for containers without UID
+        const containerUid = container.uid !== undefined ? container.uid : 0;
+        const user = this.props.users.find(user => user.uid === containerUid);
+        cockpit.assert(user, `User not found for container uid ${containerUid}`);
 
         const columns = [
             { title: info_block, sortKey: container.Name ?? container.Id },
             {
-                title: (container.uid === 0) ? _("system") : <div><span className="ct-grey-text">{_("user:")} </span>{user.name}</div>,
+                title: (containerUid === 0) ? _("system") : <div><span className="ct-grey-text">{_("user:")} </span>{user.name}</div>,
                 props: { modifier: "nowrap" },
                 sortKey: container.key,
             },

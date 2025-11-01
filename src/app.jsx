@@ -271,6 +271,9 @@ class Application extends React.Component {
         /* The following events do not need to trigger any state updates */
         case 'attach':
         case 'exec':
+        case 'exec_create':
+        case 'exec_start':
+        case 'exec_die':
         case 'export':
         case 'import':
         case 'init':
