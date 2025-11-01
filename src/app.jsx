@@ -35,9 +35,9 @@ import { superuser } from "superuser";
 import ContainerHeader from './ContainerHeader.jsx';
 import Containers from './Containers.jsx';
 import Images from './Images.jsx';
-import * as client from './client.js';
+import * as client from './client.ts';
 import detect_quadlets from './detect-quadlets.py';
-import rest from './rest.js';
+import rest from './rest.ts';
 import { makeKey, WithDockerInfo, debug } from './util.js';
 
 const _ = cockpit.gettext;
@@ -59,28 +59,18 @@ class Application extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            // currently connected services per user: { con, uid, name, dbus: { client, subscription }, imagesLoaded, containersLoaded, podsLoaded, quadletsLoaded }
-            // start with dummy state to wait for initialization
-            users: [{ con: null, uid: 0, name: _("system"), dbus: null }, { con: null, uid: null, name: _("user"), dbus: null }],
+            serviceAvailable: null, // null = not checked yet, true/false = available or not
             images: null,
             containers: null,
+            containersLoaded: false,
+            imagesLoaded: false,
             containersFilter: "all",
             containersStats: {},
-            // Mapping of quadlet containers and pods on the system to show
-            // inactive containers and pods as quadlets are ephemeral and the
-            // container/pod is not kept around when they are stopped.
-            // { "$uid-$name.service": { source_path, name, exec, image, pod  } }
-            quadletContainers: {},
-            // { "$uid-$name-pod.service": { source_path, name } }
-            quadletPods: {},
             textFilter: "",
             ownerFilter: "all",
-            dropDownValue: 'Everything',
             notifications: [],
             version: '1.3.0',
             selinuxAvailable: false,
-            userDockerRestartAvailable: false,
-            userLingeringEnabled: null,
             location: {},
         };
         this.onAddNotification = this.onAddNotification.bind(this);
@@ -167,71 +157,49 @@ class Application extends React.Component {
         });
     }
 
-    updateContainerStats(con) {
-        client.streamContainerStats(con, reply => {
-            if (reply.Error != null) // executed when container stop
-                console.warn("Failed to update container stats:", JSON.stringify(reply.message));
-            else {
-                reply.Stats.forEach(stat => this.updateState("containersStats", makeKey(con.uid, stat.ContainerID), stat));
-            }
-        }).catch(ex => {
-            if (ex.cause == "no support for CGroups V1 in rootless environments" || ex.cause == "Container stats resource only available for cgroup v2") {
-                console.log("This OS does not support CgroupsV2. Some information may be missing.");
-            } else
-                console.warn("Failed to update container stats:", JSON.stringify(ex.message));
-        });
+    updateContainerStats() {
+        // Container stats streaming disabled for simplified client architecture
+        // Can be re-implemented later if needed per-container
+        console.debug("Container stats streaming disabled for simplified architecture");
     }
 
-    initContainers(con) {
-        return client.getContainers(con)
+    initContainers() {
+        return client.getContainers()
                 .then(containerList => Promise.all(
-                    containerList.map(container => client.inspectContainer(con, container.Id))
+                    containerList.map(container => client.inspectContainer(container.Id))
                 ))
                 .then(containerDetails => {
-                    this.setState(prevState => {
-                        // keep/copy the containers of other users
-                        const copyContainers = {};
-                        Object.entries(prevState.containers || {}).forEach(([id, container]) => {
-                            if (container.uid !== con.uid)
-                                copyContainers[id] = container;
-                        });
-                        for (const detail of containerDetails) {
-                            detail.uid = con.uid;
-                            detail.key = makeKey(con.uid, detail.Id);
-                            copyContainers[detail.key] = detail;
-                        }
+                    const containers = {};
+                    for (const detail of containerDetails) {
+                        detail.key = detail.Id;
+                        containers[detail.key] = detail;
+                    }
 
-                        const users = prevState.users.map(u => u.uid === con.uid ? { ...u, containersLoaded: true } : u);
-                        return { containers: copyContainers, users };
+                    this.setState({
+                        containers,
+                        containersLoaded: true
                     });
-                    this.updateContainerStats(con);
+                    this.updateContainerStats();
                 })
-                .catch(e => console.warn("initContainers uid", con.uid, "getContainers failed:", e.toString()));
+                .catch(e => console.warn("initContainers failed:", e.toString()));
     }
 
-    updateImages(con) {
-        client.getImages(con)
+    updateImages() {
+        client.getImages()
                 .then(reply => {
-                    this.setState(prevState => {
-                        // Copy only images that could not be deleted with this event
-                        // So when event from one uid comes, only copy the other images
-                        const copyImages = {};
-                        Object.entries(prevState.images || {}).forEach(([Id, image]) => {
-                            if (image.uid !== con.uid)
-                                copyImages[Id] = image;
-                        });
-                        Object.entries(reply).forEach(([Id, image]) => {
-                            image.uid = con.uid;
-                            image.key = makeKey(con.uid, Id);
-                            copyImages[image.key] = image;
-                        });
+                    const images = {};
+                    Object.entries(reply).forEach(([Id, image]) => {
+                        image.key = Id;
+                        images[image.key] = image;
+                    });
 
-                        const users = prevState.users.map(u => u.uid === con.uid ? { ...u, imagesLoaded: true } : u);
-                        return { images: copyImages, users };
+                    this.setState({
+                        images,
+                        imagesLoaded: true
                     });
                 })
                 .catch(ex => {
-                    console.warn("Failed to do updateImages for uid", con.uid, ":", JSON.stringify(ex));
+                    console.warn("Failed to update images:", JSON.stringify(ex));
                 });
     }
 
@@ -241,7 +209,7 @@ class Application extends React.Component {
         const key = makeKey(con.uid, id);
         const wait = this.pendingUpdateContainer[key] ?? Promise.resolve();
 
-        const new_wait = wait.then(() => client.inspectContainer(con, id))
+        const new_wait = wait.then(() => client.inspectContainer(id))
                 .then(details => {
                     details.uid = con.uid;
                     details.key = key;
@@ -259,7 +227,7 @@ class Application extends React.Component {
     }
 
     updateImage(con, id) {
-        client.getImages(con, id)
+        client.getImages(id)
                 .then(reply => {
                     const image = reply[id];
                     image.uid = con.uid;
@@ -585,183 +553,40 @@ class Application extends React.Component {
                 });
     }
 
-    async init(uid, username) {
-        debug("init uid", uid, "name", username);
-        const system = uid === 0;
-        const is_other_user = (uid !== 0 && uid !== null);
-
-        let con = null;
-
+    async init() {
+        console.debug("Initializing Docker connection...");
+        
         try {
-            // Connect to Docker daemon first to see if it's already running
-            console.debug("Attempting to connect to Docker daemon for uid:", uid);
-            con = rest.connect(uid);
+            // Simple connection test like working repository
+            const reply = await client.getInfo();
+            console.debug("Docker connection successful");
             
-            // Test the connection with getInfo
-            console.debug("Testing Docker connection with getInfo...");
-            let reply;
-            
-            try {
-                reply = await client.getInfo(con);
-                console.debug("Docker is already running, no need to start services");
-            } catch (connection_error) {
-                console.debug("Docker not accessible, trying to start services:", connection_error);
-                
-                // Only try to start services if Docker connection failed
-                const environ = is_other_user ? ["XDG_RUNTIME_DIR=/run/user/" + uid] : [];
-                const spawn_options = { superuser: uid === null ? null : "require", err: "message", environ };
-                
-                let service_started = false;
-                
-                // Try docker.service first
-                try {
-                    const service_args = [
-                        ...(is_other_user ? ["runuser", "-u", username, "--"] : []),
-                        "systemctl",
-                        ...(system ? [] : ["--user"]),
-                        "start", "docker.service"
-                    ];
-                    await cockpit.spawn(service_args, spawn_options);
-                    service_started = true;
-                    console.debug("Successfully started docker.service");
-                } catch (service_error) {
-                    console.debug("docker.service failed:", service_error);
-                    
-                    // Try docker.socket as fallback
-                    try {
-                        const socket_args = [
-                            ...(is_other_user ? ["runuser", "-u", username, "--"] : []),
-                            "systemctl",
-                            ...(system ? [] : ["--user"]),
-                            "start", "docker.socket"
-                        ];
-                        await cockpit.spawn(socket_args, spawn_options);
-                        service_started = true;
-                        console.debug("Successfully started docker.socket");
-                    } catch (socket_error) {
-                        console.debug("docker.socket also failed:", socket_error);
-                        // Continue anyway - Docker might be running without systemd
-                    }
-                }
-                
-                // Wait a moment for services to start if we started one
-                if (service_started) {
-                    await new Promise(resolve => setTimeout(resolve, 2000));
-                }
-                
-                // Try connection again after starting services
-                console.debug("Retrying Docker connection after service start...");
-                reply = await client.getInfo(con);
-            }
-            this.setState(prevState => {
-                const users = prevState.users.filter(u => u.uid !== uid);
-                users.push({ con, uid, name: username, containersLoaded: false, podsLoaded: false, imagesLoaded: false, quadletsLoaded: false });
-                // keep a nice sort order for dialogs
-                users.sort(compareUser);
-                debug("init uid", uid, "username", username, "new users:", users);
-                return {
-                    users,
-                    version: reply.version.Version,
-                    registries: reply.registries,
-                    cgroupVersion: reply.host.cgroupVersion,
-                };
+            this.setState({
+                serviceAvailable: true,
+                version: reply.version?.Version || reply.ServerVersion,
+                registries: reply.registries || reply.RegistryConfig?.IndexConfigs,
+                cgroupVersion: reply.host?.cgroupVersion || reply.CgroupVersion,
             });
+            
+            this.updateImages();
+            this.initContainers();
+            
+            // Start event streaming
+            client.streamEvents(message => this.handleEvent(message))
+                    .catch(e => console.error("streamEvents failed:", JSON.stringify(e)))
+                    .finally(() => {
+                        console.log("Docker service connection closed");
+                        this.setState({ serviceAvailable: false });
+                    });
         } catch (err) {
-            if (!system || err.problem != 'access-denied')
-                console.warn("init uid", uid, "getInfo failed:", err.toString());
-
-            this.setState(prevState => ({ users: prevState.users.filter(u => u.uid !== uid) }));
-            return;
+            console.warn("Docker connection failed:", err.toString());
+            this.setState({ serviceAvailable: false });
         }
-
-        this.updateImages(con);
-        this.initContainers(con);
-        // Skip quadlet initialization - not applicable for Docker (Podman-specific feature)
-        // this.initQuadlets(con);
-        this.subscribeDaemonReload(con);
-        // Skip pod functionality - removed from Docker version
-        // this.updatePods(con);
-
-        client.streamEvents(con, message => this.handleEvent(message, con))
-                .catch(e => console.error("uid", uid, "streamEvents failed:", JSON.stringify(e)))
-                .finally(() => {
-                    console.log("uid", uid, "docker service closed");
-                    this.cleanupAfterService(con);
-                    const user = this.state.users.find(u => u.uid === uid);
-                    if (user?.dbus) {
-                        user.dbus?.subscription?.remove();
-                        user.dbus?.client?.close();
-                    }
-                });
     }
 
     componentDidMount() {
-        superuser.addEventListener("changed", () => this.init(0, _("system")));
-
-        cockpit.user().then(user => {
-            // there is no "user service" for root, ignore that
-            if (user.id === 0) {
-                // clear the dummy init user, otherwise UI waits forever for initialization
-                this.setState(prevState => ({ users: prevState.users.filter(u => u.uid !== null) }));
-                return;
-            }
-
-            cockpit.script("echo $XDG_RUNTIME_DIR")
-                    .then(xrd => {
-                        sessionStorage.setItem('XDG_RUNTIME_DIR', xrd.trim());
-                        this.init(null, user.name || _("User"));
-                        this.checkUserRestartService();
-                    })
-                    .catch(e => console.log("Could not read $XDG_RUNTIME_DIR:", e.message));
-
-            // HACK: https://github.com/systemd/systemd/issues/22244#issuecomment-1210357701
-            cockpit.file(`/var/lib/systemd/linger/${user.name}`).watch((content, tag) => {
-                if (content == null && tag === '-') {
-                    this.setState({ userLingeringEnabled: false });
-                } else {
-                    this.setState({ userLingeringEnabled: true });
-                }
-            });
-
-            // detect which other users have containers running
-            cockpit.spawn([
-                'find', '/sys/fs/cgroup',
-                // RHEL 8 version still calls it "docker-*.scope", newer ones "libpod*"
-                '(', '-name', 'libpod.*scope', '-o', '-name', 'docker-*.scope',
-                '-o', '-name', 'libpod-payload*', ')',
-                '-exec', 'stat', '--format=%u %U', '{}', ';'],
-                          // this find command doesn't need root, but user switching does;
-                          // hence skip the whole detection for unpriv sessions
-                          { superuser: "require", error: "message" })
-                    .then(output => {
-                        const other_users = [];
-                        const trimmed = output.trim();
-                        if (!trimmed)
-                            return;
-
-                        trimmed.split('\n').forEach(line => {
-                            const [uid_str, username] = line.split(' ');
-                            const uid = parseInt(uid_str);
-                            if (isNaN(uid)) {
-                                console.error(`User container detection: invalid uid '${uid_str}' in output '${output}'`); // not-covered: Should Not Happen™
-                                return; // not-covered: ditto
-                            }
-                            // ignore standard users
-                            if (uid === 0 || uid === user.id)
-                                return;
-                            if (!other_users.find(u => u.uid === uid))
-                                other_users.push({ uid, name: username, con: null });
-                        });
-                        debug("other users who have containers running:", JSON.stringify(other_users));
-                        this.setState(prevState => ({ users: prevState.users.concat(other_users) }));
-                    })
-                    .catch(ex => {
-                        if (ex.problem == 'access-denied')
-                            debug("unprivileged session, skipping detection of other users");
-                        else
-                            console.warn("failed to detect other users:", ex);
-                    });
-        });
+        // Simple initialization like working repository
+        this.init();
 
         cockpit.spawn("selinuxenabled", { error: "ignore" })
                 .then(() => this.setState({ selinuxAvailable: true }))
@@ -858,7 +683,7 @@ class Application extends React.Component {
                 .then(() => {
                     console.debug("Successfully started docker.socket");
                     // Reinitialize connections after starting service
-                    this.initializeUsers();
+                    this.init(0, _("system"));
                 })
                 .catch(err => {
                     console.warn("Failed to start docker.socket:", JSON.stringify(err));
@@ -873,8 +698,8 @@ class Application extends React.Component {
     }
 
     render() {
-        // show troubleshoot if no users are available, i.e. all user's docker services failed
-        if (this.state.users.length === 0) {
+        // Show start screen if Docker service is not available
+        if (this.state.serviceAvailable === false) {
             return (
                 <Page className="pf-m-no-sidebar">
                     <PageSection hasBodyWrapper={false}>
@@ -895,33 +720,29 @@ class Application extends React.Component {
             );
         }
 
-        if (this.state.users.find(u => u.con === null && (u.uid === 0 || u.uid === null))) // not initialized yet
+        // Show loading while checking Docker availability
+        if (this.state.serviceAvailable === null)
             return null;
 
         let imageContainerList = {};
         if (this.state.containers !== null) {
             Object.keys(this.state.containers).forEach(c => {
                 const container = this.state.containers[c];
-                const imageKey = makeKey(container.uid, container.Image);
+                const imageKey = container.Image;
                 if (!imageContainerList[imageKey])
                     imageContainerList[imageKey] = [];
                 imageContainerList[imageKey].push({
                     container,
-                    stats: this.state.containersStats[makeKey(container.uid, container.Id)],
+                    stats: this.state.containersStats[container.Id],
                 });
             });
         } else
             imageContainerList = null;
 
-        const loadingImages = this.state.users.find(u => u.con && !u.imagesLoaded);
-        const loadingContainers = this.state.users.find(u => u.con && !u.containersLoaded);
-        const loadingPods = this.state.users.find(u => u.con && !u.podsLoaded);
-        const loadingQuadlets = this.state.users.find(u => u.con && !u.quadletsLoaded);
-
         const imageList = (
             <Images
                 key="imageList"
-                images={loadingImages ? null : this.state.images}
+                images={this.state.imagesLoaded ? this.state.images : null}
                 imageContainerList={imageContainerList}
                 onAddNotification={this.onAddNotification}
                 textFilter={this.state.textFilter}
@@ -934,9 +755,9 @@ class Application extends React.Component {
             <Containers
                 key="containerList"
                 version={this.state.version}
-                images={loadingImages ? null : this.state.images}
-                containers={loadingContainers ? null : this.state.containers}
-                pods={loadingPods ? null : this.state.pods}
+                images={this.state.imagesLoaded ? this.state.images : null}
+                containers={this.state.containersLoaded ? this.state.containers : null}
+                pods={this.state.pods}
                 containersStats={this.state.containersStats}
                 filter={this.state.containersFilter}
                 handleFilterChange={this.onContainerFilterChanged}
@@ -946,8 +767,8 @@ class Application extends React.Component {
                 onAddNotification={this.onAddNotification}
                 cgroupVersion={this.state.cgroupVersion}
                 updateContainer={this.updateContainer}
-                quadletContainers={loadingQuadlets ? null : this.state.quadletContainers}
-                quadletPods={loadingQuadlets ? null : this.state.quadletPods}
+                quadletContainers={this.state.quadletContainers}
+                quadletPods={this.state.quadletPods}
             />
         );
 
