@@ -1,4 +1,4 @@
-# #-#-#-#-#  podman.js.pot (PACKAGE VERSION)  #-#-#-#-#
+# #-#-#-#-#  docker.js.pot (PACKAGE VERSION)  #-#-#-#-#
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
@@ -12,7 +12,7 @@ msgstr ""
 "PO-Revision-Date: 2025-07-21 10:54+0000\n"
 "Last-Translator: Luna Jernberg <bittin@reimu.nl>\n"
 "Language-Team: Swedish <https://translate.fedoraproject.org/projects/cockpit/"
-"cockpit-podman/sv/>\n"
+"cockpit-docker/sv/>\n"
 "Language: sv\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -149,13 +149,13 @@ msgstr "Klicka för att se publicerade portar"
 msgid "Click to see volumes"
 msgstr "Klicka för att se volymer"
 
-#: org.cockpit_project.podman.metainfo.xml:22
+#: org.cockpit_project.docker.metainfo.xml:22
 msgid "Cockpit Project"
 msgstr "Cockpitprojektet"
 
-#: org.cockpit_project.podman.metainfo.xml:6
-msgid "Cockpit component for Podman containers"
-msgstr "Cockpit komponent för Podman-behållare"
+#: org.cockpit_project.docker.metainfo.xml:6
+msgid "Cockpit component for Docker containers"
+msgstr "Cockpit komponent för Docker-behållare"
 
 #: src/ContainerDetails.jsx:43 src/ContainerCommitModal.jsx:116
 #: src/ContainerHealthLogs.jsx:63 src/ImageRunModal.jsx:927
@@ -944,17 +944,17 @@ msgstr "Podden kunde inte skapas"
 msgid "Pod name"
 msgstr "Pod namn"
 
-#: org.cockpit_project.podman.metainfo.xml:5
-msgid "Podman"
-msgstr "Podman"
+#: org.cockpit_project.docker.metainfo.xml:5
+msgid "Docker"
+msgstr "Docker"
 
 #: src/manifest.json:0
-msgid "Podman containers"
-msgstr "Podman-behållare"
+msgid "Docker containers"
+msgstr "Docker-behållare"
 
 #: src/app.jsx:854
-msgid "Podman service failed"
-msgstr "Podman-tjänsten misslyckades"
+msgid "Docker service failed"
+msgstr "Docker-tjänsten misslyckades"
 
 #: src/PodCreateModal.jsx:184 src/ImageRunModal.jsx:1047
 msgid "Port mapping"
@@ -1224,14 +1224,14 @@ msgstr "Tagg"
 msgid "Tags"
 msgstr "Taggar"
 
-#: org.cockpit_project.podman.metainfo.xml:10
+#: org.cockpit_project.docker.metainfo.xml:10
 msgid ""
-"The Cockpit user interface for Podman containers. podman (Pod Manager) is a "
+"The Cockpit user interface for Docker containers. docker (Pod Manager) is a "
 "fully featured daemon-less engine for OCI containers, pods (groups of "
 "containers), and container images. It is CLI, API, and functionally "
 "compatible with Docker."
 msgstr ""
-"Cockpit-användargränssnittet för Podman-behållare. podman (Pod Manager) är "
+"Cockpit-användargränssnittet för Docker-behållare. docker (Pod Manager) är "
 "en fullfjädrad demonfri motor för OCI-behållare, pods (grupper av behållare) "
 "och behållaravbilder. Det är CLI, API och funktionellt kompatibelt med "
 "Docker."
@@ -1369,8 +1369,8 @@ msgid "pod"
 msgstr "pod"
 
 #: src/manifest.json:0
-msgid "podman"
-msgstr "podman"
+msgid "docker"
+msgstr "docker"
 
 #: src/Containers.jsx:585
 msgid "ports"
@@ -1423,20 +1423,20 @@ msgstr "volymer"
 #~ msgid "Delete unused user images:"
 #~ msgstr "Ta bort oanvända användaravbilder:"
 
-#~ msgid "Automatically start podman on boot"
-#~ msgstr "Kör igång podman automatiskt vid uppstart"
+#~ msgid "Automatically start docker on boot"
+#~ msgstr "Kör igång docker automatiskt vid uppstart"
 
-#~ msgid "Start podman"
-#~ msgstr "Starta podman"
+#~ msgid "Start docker"
+#~ msgstr "Starta docker"
 
-#~ msgid "System Podman service is also available"
-#~ msgstr "System-podman-tjänsten är också tillgänglig"
+#~ msgid "System Docker service is also available"
+#~ msgstr "System-docker-tjänsten är också tillgänglig"
 
-#~ msgid "User Podman service is also available"
-#~ msgstr "Användar-podman-tjänsten är också tillgänglig"
+#~ msgid "User Docker service is also available"
+#~ msgstr "Användar-docker-tjänsten är också tillgänglig"
 
-#~ msgid "The Cockpit user interface for Podman containers."
-#~ msgstr "Cockpit-användargränssnittet för Podman-behållare."
+#~ msgid "The Cockpit user interface for Docker containers."
+#~ msgstr "Cockpit-användargränssnittet för Docker-behållare."
 
 #~ msgid "Delete $0"
 #~ msgstr "Radera $0"

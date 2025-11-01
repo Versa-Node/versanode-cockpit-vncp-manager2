@@ -364,8 +364,8 @@ class Containers extends React.Component {
         let localized_health = null;
 
         // this needs to get along with stub containers from image run dialog, where most properties don't exist yet
-        // HACK: Podman renamed `Healthcheck` to `Health` randomly
-        // https://github.com/containers/podman/commit/119973375
+        // HACK: Docker renamed `Healthcheck` to `Health` randomly
+        // https://github.com/containers/docker/commit/119973375
         const healthcheck = container.State?.Health?.Status ?? container.State?.Healthcheck?.Status; // not-covered: only on old version
         const status = container.State?.Status ?? ""; // not-covered: race condition
 
@@ -521,7 +521,7 @@ class Containers extends React.Component {
             return null;
         }
 
-        // As podman does not provide per pod memory/cpu statistics we do the following:
+        // As docker does not provide per pod memory/cpu statistics we do the following:
         // - add up CPU usage to display total CPU use of all containers in the pod
         // - add up memory usage so it displays the total memory of the pod.
         let cpu = 0;
@@ -736,7 +736,7 @@ class Containers extends React.Component {
                 }
             });
 
-            // Combine the podman containers with inactive quadlets, active
+            // Combine the docker containers with inactive quadlets, active
             // quadlets have a running container or pod associated with them
             const filteredQuadlets = this.filterContainers(this.props.quadletContainers);
             filteredQuadlets.forEach(id => {
@@ -815,20 +815,20 @@ class Containers extends React.Component {
         const createContainer = (inPod) => {
             if (nonIntermediateImages)
                 Dialogs.show(
-                    <utils.PodmanInfoContext.Consumer>
-                        {(podmanInfo) => (
+                    <utils.DockerInfoContext.Consumer>
+                        {(dockerInfo) => (
                             <DialogsContext.Consumer>
                                 {(Dialogs) => (
                                     <ImageRunModal users={this.props.users}
                                                    localImages={nonIntermediateImages}
                                                    pod={inPod}
                                                    onAddNotification={this.props.onAddNotification}
-                                                   podmanInfo={podmanInfo}
+                                                   dockerInfo={dockerInfo}
                                                    dialogs={Dialogs} />
                                 )}
                             </DialogsContext.Consumer>
                         )}
-                    </utils.PodmanInfoContext.Consumer>);
+                    </utils.DockerInfoContext.Consumer>);
         };
 
         const createPod = () => {

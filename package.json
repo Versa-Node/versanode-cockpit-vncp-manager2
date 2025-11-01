@@ -1,9 +1,9 @@
 {
-  "name": "podman",
-  "description": "Cockpit UI for Podman Containers",
+  "name": "VNCP Manager",
+  "description": "VNCP Manager UI for Docker Containers",
   "type": "module",
   "main": "index.js",
-  "repository": "git@github.com:cockpit-project/cockpit-podman.git",
+  "repository": "git@github.com/Versa-Node/versanode-cockpit-vncp-manager.git",
   "author": "",
   "license": "LGPL-2.1",
   "scripts": {

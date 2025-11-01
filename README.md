@@ -1,11 +1,11 @@
-# cockpit-podman
+# cockpit-docker
 
-This is the [Cockpit](https://cockpit-project.org/) user interface for [podman
-containers](https://podman.io/).
+This is the [Cockpit](https://cockpit-project.org/) user interface for [docker
+containers](https://docker.io/).
 
 ## Technologies
 
- - cockpit-podman communicates to podman through its [REST API](https://podman.readthedocs.io/en/latest/_static/api.html).
+ - cockpit-docker communicates to docker through its [REST API](https://docker.readthedocs.io/en/latest/_static/api.html).
 
  - This project is based on the [Cockpit Starter Kit](https://github.com/cockpit-project/starter-kit).
    See [Starter Kit Intro](http://cockpit-project.org/blog/cockpit-starter-kit.html) for details.
@@ -25,8 +25,8 @@ On Fedora:
 These commands check out the source and build it into the `dist/` directory:
 
 ```
-git clone https://github.com/cockpit-project/cockpit-podman
-cd cockpit-podman
+git clone https://github.com/cockpit-project/cockpit-docker
+cd cockpit-docker
 make
 ```
 

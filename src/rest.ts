@@ -26,7 +26,7 @@ let call_id = 0;
 const NL = '\n'.charCodeAt(0); // always 10, but avoid magic constant
 const CR = '\r'.charCodeAt(0); // always 13, but avoid magic constant
 
-const PODMAN_SYSTEM_ADDRESS = "/run/podman/podman.sock";
+const PODMAN_SYSTEM_ADDRESS = "/run/docker/docker.sock";
 
 export type Uid = number | null; // standard Unix UID or null for logged in session user
 
@@ -36,7 +36,7 @@ function getAddress(uid: Uid): { path: string, superuser?: cockpit.ChannelOption
         // FIXME: make this async and call cockpit.user()
         const xrd = sessionStorage.getItem('XDG_RUNTIME_DIR');
         if (xrd)
-            return { path: xrd + "/podman/podman.sock" };
+            return { path: xrd + "/docker/docker.sock" };
         console.warn("$XDG_RUNTIME_DIR is not present. Cannot use user service.");
         return { path: "" };
     }
@@ -45,7 +45,7 @@ function getAddress(uid: Uid): { path: string, superuser?: cockpit.ChannelOption
         return { path: PODMAN_SYSTEM_ADDRESS, superuser: "require" };
 
     if (Number.isInteger(uid))
-        return { path: `/run/user/${uid}/podman/podman.sock`, superuser: "require" };
+        return { path: `/run/user/${uid}/docker/docker.sock`, superuser: "require" };
 
     throw new Error(`getAddress: uid ${uid} not supported`);
 }
@@ -57,7 +57,7 @@ function splitAtNLNL(array: Uint8Array): [Uint8Array, Uint8Array | null] {
             return [array.subarray(0, i), array.subarray(i + 4)];
         }
     }
-    console.error("did not find NLNL in array", array); // not-covered: if this happens, it's a podman bug
+    console.error("did not find NLNL in array", array); // not-covered: if this happens, it's a docker bug
     return [array, null]; // not-covered: ditto
 }
 
@@ -133,7 +133,7 @@ function connect(uid: Uid): Connection {
                     if (body)
                         onDataMessage(event, body);
                 } else {
-                    // empty body Should not Happen™, would be a podman bug
+                    // empty body Should not Happen™, would be a docker bug
                     const body_text = body ? decoder.decode(body) : "(empty)";
                     reject(format_error({ reason: headers.split('\r\n')[0] }, body_text));
                 }

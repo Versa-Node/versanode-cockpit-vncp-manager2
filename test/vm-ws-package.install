@@ -1,5 +1,5 @@
 #!/bin/sh
-# image-customize script to prepare a bots VM for cockpit-podman testing
+# image-customize script to prepare a bots VM for cockpit-docker testing
 # This part applies to cockpit-ws package
 set -eu
 

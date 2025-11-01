@@ -1,6 +1,6 @@
 Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
-Upstream-Name: cockpit-podman
-Source: https://github.com/cockpit-project/cockpit-podman
+Upstream-Name: cockpit-docker
+Source: https://github.com/cockpit-project/cockpit-docker
 Comment:
  This does not directly cover the files in dist/*. These are "minified" and
  compressed JavaScript/HTML files built from src/, lib/, po/, and node_modules/

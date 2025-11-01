@@ -1,4 +1,4 @@
-# #-#-#-#-#  podman.js.pot (PACKAGE VERSION)  #-#-#-#-#
+# #-#-#-#-#  docker.js.pot (PACKAGE VERSION)  #-#-#-#-#
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
@@ -12,7 +12,7 @@ msgstr ""
 "PO-Revision-Date: 2025-06-07 04:53+0000\n"
 "Last-Translator: Temuri Doghonadze <temuri.doghonadze@gmail.com>\n"
 "Language-Team: Georgian <https://translate.fedoraproject.org/projects/"
-"cockpit/cockpit-podman/ka/>\n"
+"cockpit/cockpit-docker/ka/>\n"
 "Language: ka\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -150,13 +150,13 @@ msgstr "დააწკაპუნეთ გამოჩენილი პო�
 msgid "Click to see volumes"
 msgstr "დააწკაპუნეთ ტომების სანახავად"
 
-#: org.cockpit_project.podman.metainfo.xml:22
+#: org.cockpit_project.docker.metainfo.xml:22
 msgid "Cockpit Project"
 msgstr "პროექტი Cockpit"
 
-#: org.cockpit_project.podman.metainfo.xml:6
-msgid "Cockpit component for Podman containers"
-msgstr "Cockpit-ის კომპონენტი Podman-ის კონტეინერებისთვის"
+#: org.cockpit_project.docker.metainfo.xml:6
+msgid "Cockpit component for Docker containers"
+msgstr "Cockpit-ის კომპონენტი Docker-ის კონტეინერებისთვის"
 
 #: src/ContainerDetails.jsx:43 src/ContainerCommitModal.jsx:116
 #: src/ContainerHealthLogs.jsx:63 src/ImageRunModal.jsx:927
@@ -945,17 +945,17 @@ msgstr "Pod-ის შექმნის შეცდომა"
 msgid "Pod name"
 msgstr "Pod-ის სახელი"
 
-#: org.cockpit_project.podman.metainfo.xml:5
-msgid "Podman"
-msgstr "Podman"
+#: org.cockpit_project.docker.metainfo.xml:5
+msgid "Docker"
+msgstr "Docker"
 
 #: src/manifest.json:0
-msgid "Podman containers"
-msgstr "Podman-ის კონტეინერები"
+msgid "Docker containers"
+msgstr "Docker-ის კონტეინერები"
 
 #: src/app.jsx:854
-msgid "Podman service failed"
-msgstr "Podman-ის სერვისი ჩავარდა"
+msgid "Docker service failed"
+msgstr "Docker-ის სერვისი ჩავარდა"
 
 #: src/PodCreateModal.jsx:184 src/ImageRunModal.jsx:1047
 msgid "Port mapping"
@@ -1225,14 +1225,14 @@ msgstr "ჭდე"
 msgid "Tags"
 msgstr "ჭდეები"
 
-#: org.cockpit_project.podman.metainfo.xml:10
+#: org.cockpit_project.docker.metainfo.xml:10
 msgid ""
-"The Cockpit user interface for Podman containers. podman (Pod Manager) is a "
+"The Cockpit user interface for Docker containers. docker (Pod Manager) is a "
 "fully featured daemon-less engine for OCI containers, pods (groups of "
 "containers), and container images. It is CLI, API, and functionally "
 "compatible with Docker."
 msgstr ""
-"Cockpit-ის მომხმარებლის ინტერფეისი Podman-ის კონტეინერებისთვის. podman (Pod-"
+"Cockpit-ის მომხმარებლის ინტერფეისი Docker-ის კონტეინერებისთვის. docker (Pod-"
 "ების მმართველი) უდემონო სრულად ფუნქციონალური ძრავაა OCI კონტეინერებისთვის, "
 "pod-ებისთვის (კონტეინერის ჯგუფებისთვის) და კონტეინერის დისკის ასლის "
 "ფაილებისთვს. ის CLI-თი, API-თი და ფუნქციონალით თავსებადია Docker-თან."
@@ -1370,8 +1370,8 @@ msgid "pod"
 msgstr "pod"
 
 #: src/manifest.json:0
-msgid "podman"
-msgstr "podman"
+msgid "docker"
+msgstr "docker"
 
 #: src/Containers.jsx:585
 msgid "ports"
@@ -1421,20 +1421,20 @@ msgstr "ტომები"
 #~ msgid "pod group"
 #~ msgstr "pod-ების ჯგუფი"
 
-#~ msgid "Automatically start podman on boot"
-#~ msgstr "podman-ის გაშვება სისტემის ჩატვირთვისას"
+#~ msgid "Automatically start docker on boot"
+#~ msgstr "docker-ის გაშვება სისტემის ჩატვირთვისას"
 
-#~ msgid "Start podman"
-#~ msgstr "Podman-ის გაშვება"
+#~ msgid "Start docker"
+#~ msgstr "Docker-ის გაშვება"
 
-#~ msgid "System Podman service is also available"
-#~ msgstr "ასევე ხელმისაწვდომია Podman-ის სისტემური სერვისი"
+#~ msgid "System Docker service is also available"
+#~ msgstr "ასევე ხელმისაწვდომია Docker-ის სისტემური სერვისი"
 
-#~ msgid "User Podman service is also available"
-#~ msgstr "ასევე ხელმისაწვდომია Podman-ის მომხმარებლის სერვისი"
+#~ msgid "User Docker service is also available"
+#~ msgstr "ასევე ხელმისაწვდომია Docker-ის მომხმარებლის სერვისი"
 
-#~ msgid "The Cockpit user interface for Podman containers."
-#~ msgstr "Cockpit-ის მომხმარებლის ინტერფეისი Podman-ის კონტეინერებისთვის."
+#~ msgid "The Cockpit user interface for Docker containers."
+#~ msgstr "Cockpit-ის მომხმარებლის ინტერფეისი Docker-ის კონტეინერებისთვის."
 
 #~ msgid "Delete $0"
 #~ msgstr "$0-ის წაშლა"

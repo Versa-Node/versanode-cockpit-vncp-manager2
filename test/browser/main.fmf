@@ -1,6 +1,6 @@
 require:
   - systemd-container
-  - cockpit-podman
+  - cockpit-docker
   - cockpit-ws
   - cockpit-system
   - criu

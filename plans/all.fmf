@@ -16,12 +16,12 @@ environment:
     TEST_AUDIT_NO_SELINUX: 1
 
 /system:
-    summary: Run tests on system podman
+    summary: Run tests on system docker
     discover+:
         test: /test/browser/system
 
 /user:
-    summary: Run tests on user podman
+    summary: Run tests on user docker
     discover+:
         test: /test/browser/user
 

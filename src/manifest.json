@@ -1,14 +1,14 @@
 {
     "conditions": [
-        {"path-exists": "/lib/systemd/system/podman.socket"}
+        {"path-exists": "/lib/systemd/system/docker.socket"}
     ],
     "menu": {
         "index": {
-            "label": "Podman containers",
+            "label": "Docker containers",
             "order": 50,
             "keywords": [
                 {
-                    "matches": ["podman", "container", "image"]
+                    "matches": ["docker", "container", "image"]
                 }
             ]
         }

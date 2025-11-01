@@ -2,7 +2,7 @@ name: nightly
 on:
   schedule:
     - cron: '0 1 * * *'
-  # can be run manually on https://github.com/cockpit-project/cockpit-podman/actions
+  # can be run manually on https://github.com/cockpit-project/cockpit-docker/actions
   workflow_dispatch:
 jobs:
   trigger:
@@ -19,4 +19,4 @@ jobs:
           mkdir -p ~/.config/cockpit-dev
           echo "${{ github.token }}" >> ~/.config/cockpit-dev/github-token
           TEST_OS=$(PYTHONPATH=bots python3 -c 'from lib.constants import TEST_OS_DEFAULT; print(TEST_OS_DEFAULT)')
-          bots/tests-trigger --force "-" "${TEST_OS}/updates-testing" "${TEST_OS}/copr/rhcontainerbot/podman-next"
+          bots/tests-trigger --force "-" "${TEST_OS}/updates-testing" "${TEST_OS}/copr/rhcontainerbot/docker-next"

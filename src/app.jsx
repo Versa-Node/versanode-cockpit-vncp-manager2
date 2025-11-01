@@ -38,7 +38,7 @@ import Images from './Images.jsx';
 import * as client from './client.js';
 import detect_quadlets from './detect-quadlets.py';
 import rest from './rest.js';
-import { makeKey, WithPodmanInfo, debug } from './util.js';
+import { makeKey, WithDockerInfo, debug } from './util.js';
 
 const _ = cockpit.gettext;
 
@@ -79,7 +79,7 @@ class Application extends React.Component {
             notifications: [],
             version: '1.3.0',
             selinuxAvailable: false,
-            userPodmanRestartAvailable: false,
+            userDockerRestartAvailable: false,
             userLingeringEnabled: null,
             location: {},
         };
@@ -262,7 +262,7 @@ class Application extends React.Component {
     }
 
     updateContainer(con, id, event) {
-        /* when firing off multiple calls in parallel, podman can return them in a random order.
+        /* when firing off multiple calls in parallel, docker can return them in a random order.
          * This messes up the state. So we need to serialize them for a particular container. */
         const key = makeKey(con.uid, id);
         const wait = this.pendingUpdateContainer[key] ?? Promise.resolve();
@@ -313,7 +313,7 @@ class Application extends React.Component {
                 });
     }
 
-    // see https://docs.podman.io/en/latest/markdown/podman-events.1.html
+    // see https://docs.docker.io/en/latest/markdown/docker-events.1.html
 
     handleImageEvent(event, con) {
         switch (event.Action) {
@@ -358,7 +358,7 @@ class Application extends React.Component {
          */
         case 'start':
             // HACK: We don't get 'started' event for pods got started by the first container which was added to them
-            // https://github.com/containers/podman/issues/7213
+            // https://github.com/containers/docker/issues/7213
             (event.Actor.Attributes.podId
                 ? this.updatePod(con, event.Actor.Attributes.podId)
                 : this.updatePods(con)
@@ -368,13 +368,13 @@ class Application extends React.Component {
         case 'cleanup':
         case 'create':
         case 'died':
-        case 'exec_died': // HACK: pick up health check runs with older podman versions, see https://github.com/containers/podman/issues/19237
+        case 'exec_died': // HACK: pick up health check runs with older docker versions, see https://github.com/containers/docker/issues/19237
         case 'health_status':
         case 'pause':
         case 'restore':
         case 'stop':
         case 'unpause':
-        case 'rename': // rename event is available starting podman v4.1; until then the container does not get refreshed after renaming
+        case 'rename': // rename event is available starting docker v4.1; until then the container does not get refreshed after renaming
             this.updateContainer(con, id, event);
             break;
 
@@ -390,8 +390,8 @@ class Application extends React.Component {
                     newPod.Containers = newPod.Containers.filter(container => container.Id !== id);
                     pods = { ...prevState.pods, [podKey]: newPod };
                 } else {
-                    // HACK: with podman < 4.3.0 we don't get a pod event when a container in a pod is removed
-                    // https://github.com/containers/podman/issues/15408
+                    // HACK: with docker < 4.3.0 we don't get a pod event when a container in a pod is removed
+                    // https://github.com/containers/docker/issues/15408
                     pods = prevState.pods;
                     this.updatePods(con);
                 }
@@ -469,9 +469,9 @@ class Application extends React.Component {
             this.onOwnerChanged("all");
     }
 
-    // Read information about quadlets from /run/ until podman provides a remote API for this.
-    // https://github.com/containers/podman/issues/27119
-    // Required for cockpit-podman to show inactive quadlets which have no
+    // Read information about quadlets from /run/ until docker provides a remote API for this.
+    // https://github.com/containers/docker/issues/27119
+    // Required for cockpit-docker to show inactive quadlets which have no
     // stopped container/pod associated with them as they are ephemeral.
     // The state object of the container or pod has just enough properties to mock a real inactive container or pod.
     async initQuadlets(con) {
@@ -544,7 +544,7 @@ class Application extends React.Component {
                 const quadlet = quadlets.containers[key];
                 const container_key = makeKey(con.uid, key);
 
-                // Mock podman container state
+                // Mock docker container state
                 const container = {
                     uid: con.uid,
                     key: container_key,
@@ -639,7 +639,7 @@ class Application extends React.Component {
                 ...(is_other_user ? ["runuser", "-u", username, "--"] : []),
                 "systemctl",
                 ...(system ? [] : ["--user"]),
-                "start", "podman.socket"
+                "start", "docker.socket"
             ];
             const environ = is_other_user ? ["XDG_RUNTIME_DIR=/run/user/" + uid] : [];
             await cockpit.spawn(start_args, { superuser: uid === null ? null : "require", err: "message", environ });
@@ -675,7 +675,7 @@ class Application extends React.Component {
         client.streamEvents(con, message => this.handleEvent(message, con))
                 .catch(e => console.error("uid", uid, "streamEvents failed:", JSON.stringify(e)))
                 .finally(() => {
-                    console.log("uid", uid, "podman service closed");
+                    console.log("uid", uid, "docker service closed");
                     this.cleanupAfterService(con);
                     const user = this.state.users.find(u => u.uid === uid);
                     if (user?.dbus) {
@@ -716,8 +716,8 @@ class Application extends React.Component {
             // detect which other users have containers running
             cockpit.spawn([
                 'find', '/sys/fs/cgroup',
-                // RHEL 8 version still calls it "podman-*.scope", newer ones "libpod*"
-                '(', '-name', 'libpod.*scope', '-o', '-name', 'podman-*.scope',
+                // RHEL 8 version still calls it "docker-*.scope", newer ones "libpod*"
+                '(', '-name', 'libpod.*scope', '-o', '-name', 'docker-*.scope',
                 '-o', '-name', 'libpod-payload*', ')',
                 '-exec', 'stat', '--format=%u %U', '{}', ';'],
                           // this find command doesn't need root, but user switching does;
@@ -834,24 +834,24 @@ class Application extends React.Component {
 
     async checkUserRestartService() {
         const out = await cockpit.spawn(
-            ["systemctl", "--user", "show", "--value", "-p", "LoadState", "podman-restart"],
+            ["systemctl", "--user", "show", "--value", "-p", "LoadState", "docker-restart"],
             { environ: ["LC_ALL=C"], error: "ignore" });
-        this.setState({ userPodmanRestartAvailable: out.trim() === "loaded" });
+        this.setState({ userDockerRestartAvailable: out.trim() === "loaded" });
     }
 
     goToServicePage(e) {
         if (!e || e.button !== 0)
             return;
-        cockpit.jump("/system/services#/podman.socket");
+        cockpit.jump("/system/services#/docker.socket");
     }
 
     render() {
-        // show troubleshoot if no users are available, i.e. all user's podman services failed
+        // show troubleshoot if no users are available, i.e. all user's docker services failed
         if (this.state.users.length === 0) {
             return (
                 <Page className="pf-m-no-sidebar">
                     <PageSection hasBodyWrapper={false}>
-                        <EmptyState headingLevel="h2" icon={ExclamationCircleIcon} titleText={_("Podman service failed")} variant={EmptyStateVariant.full}>
+                        <EmptyState headingLevel="h2" icon={ExclamationCircleIcon} titleText={_("Docker service failed")} variant={EmptyStateVariant.full}>
                             <EmptyStateFooter>
                                 <EmptyStateActions>
                                     <Button variant="primary" onClick={this.goToServicePage}>
@@ -939,13 +939,13 @@ class Application extends React.Component {
             cgroupVersion: this.state.cgroupVersion,
             registries: this.state.registries,
             selinuxAvailable: this.state.selinuxAvailable,
-            userPodmanRestartAvailable: this.state.userPodmanRestartAvailable,
+            userDockerRestartAvailable: this.state.userDockerRestartAvailable,
             userLingeringEnabled: this.state.userLingeringEnabled,
             version: this.state.version,
         };
 
         return (
-            <WithPodmanInfo value={contextInfo}>
+            <WithDockerInfo value={contextInfo}>
                 <WithDialogs>
                     <Page id="overview" key="overview" className="pf-m-no-sidebar">
                         {notificationList}
@@ -967,7 +967,7 @@ class Application extends React.Component {
                         </PageSection>
                     </Page>
                 </WithDialogs>
-            </WithPodmanInfo>
+            </WithDockerInfo>
         );
     }
 }

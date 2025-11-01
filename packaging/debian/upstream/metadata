@@ -1,4 +1,4 @@
 ---
-Bug-Database: https://github.com/cockpit-project/cockpit-podman/issues
-Bug-Submit: https://github.com/cockpit-project/cockpit-podman/issues/new
-Repository-Browse: https://github.com/cockpit-project/cockpit-podman
+Bug-Database: https://github.com/cockpit-project/cockpit-docker/issues
+Bug-Submit: https://github.com/cockpit-project/cockpit-docker/issues/new
+Repository-Browse: https://github.com/cockpit-project/cockpit-docker

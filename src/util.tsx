@@ -8,45 +8,45 @@ import * as timeformat from 'timeformat';
 
 const _ = cockpit.gettext;
 
-// not documented in https://docs.podman.io/en/stable/_static/api.html#tag/system/operation/SystemInfoLibpod
+// not documented in https://docs.docker.io/en/stable/_static/api.html#tag/system/operation/SystemInfoLibpod
 // only the fields that we actually use
 type Registries = {
     search?: string[],
 }
 
-type PodmanInfoContextType = {
+type DockerInfoContextType = {
     cgroupVersion: string,
     registries: Registries,
     selinuxAvailable: boolean,
-    userPodmanRestartAvailable: boolean,
+    userDockerRestartAvailable: boolean,
     userLingeringEnabled: boolean,
     version: string,
 }
 
-export const PodmanInfoContext = React.createContext<PodmanInfoContextType | null>(null);
+export const DockerInfoContext = React.createContext<DockerInfoContextType | null>(null);
 
-export const usePodmanInfo = () => useContext(PodmanInfoContext);
+export const useDockerInfo = () => useContext(DockerInfoContext);
 
-export const WithPodmanInfo = ({ value, children }: { value: PodmanInfoContextType, children: React.ReactNode }) => {
+export const WithDockerInfo = ({ value, children }: { value: DockerInfoContextType, children: React.ReactNode }) => {
     return (
-        <PodmanInfoContext.Provider value={value}>
+        <DockerInfoContext.Provider value={value}>
             {children}
-        </PodmanInfoContext.Provider>
+        </DockerInfoContext.Provider>
     );
 };
 
-// https://github.com/containers/podman/blob/main/libpod/define/containerstate.go
+// https://github.com/containers/docker/blob/main/libpod/define/containerstate.go
 // "Restarting" comes from special handling of restart case in Application.updateContainer()
 export const states = [_("Exited"), _("Paused"), _("Stopped"), _("Removing"), _("Configured"), _("Created"), _("Restart"), _("Running")];
 
-// https://github.com/containers/podman/blob/main/libpod/define/podstate.go
+// https://github.com/containers/docker/blob/main/libpod/define/podstate.go
 export const podStates = [_("Created"), _("Running"), _("Stopped"), _("Paused"), _("Exited"), _("Error")];
 
 export const fallbackRegistries = ["docker.io", "quay.io"];
 
 export function debug(...args: unknown[]): void {
-    if (window.debugging === "all" || window.debugging?.includes("podman"))
-        console.debug("podman", ...args);
+    if (window.debugging === "all" || window.debugging?.includes("docker"))
+        console.debug("docker", ...args);
 }
 
 // containers, pods, images states are indexed by these keys, to make the container IDs
@@ -183,11 +183,11 @@ export const validationClear = (validationFailed: ValidationState | undefined, k
 // This method needs to be outside of component as re-render would create a new instance of debounce
 export const validationDebounce = debounce(500, (validationHandler) => validationHandler());
 
-// Ignore podman-compose containers which like quadlets set PODMAN_SYSTEMD_UNIT.
-// https://github.com/containers/podman-compose/blob/0dcc864fdda280b410ad49ae4fa99740a4770cbb/podman_compose.py#L2263
+// Ignore docker-compose containers which like quadlets set PODMAN_SYSTEMD_UNIT.
+// https://github.com/containers/docker-compose/blob/0dcc864fdda280b410ad49ae4fa99740a4770cbb/docker_compose.py#L2263
 // FIXME: yes yes, the container config type should be fully spelled out
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const is_systemd_service = (container_config: { [key: string]: any }) => container_config?.Labels?.PODMAN_SYSTEMD_UNIT && !container_config.Labels.PODMAN_SYSTEMD_UNIT.startsWith('podman-compose@');
+export const is_systemd_service = (container_config: { [key: string]: any }) => container_config?.Labels?.PODMAN_SYSTEMD_UNIT && !container_config.Labels.PODMAN_SYSTEMD_UNIT.startsWith('docker-compose@');
 
 export const systemctl_spawn = (args: string[], system: boolean = false) => {
     const systemctl_args = [

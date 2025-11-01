@@ -1,4 +1,4 @@
-.podman-search .pf-v6-c-modal-box__body {
+.docker-search .pf-v6-c-modal-box__body {
     display: grid;
     grid-auto-flow: row;
     overflow: hidden;
@@ -25,7 +25,7 @@
     }
 }
 
-.podman-search .image-search-modal-footer-grid {
+.docker-search .image-search-modal-footer-grid {
     display: grid;
     grid-template-columns: 1fr auto auto;
     gap: 0.25rem;
@@ -37,7 +37,7 @@
 
 @media (max-width: 340px) {
     /* Shrink buttons to accommodate iPhone 5/SE */
-    .podman-search .modal-footer > .btn {
+    .docker-search .modal-footer > .btn {
         padding-inline: 0.25rem;
     }
 }
@@ -46,14 +46,14 @@
     margin-block-end: var(--pf-t--global--spacer--md);
 }
 
-.podman-search .pf-v6-c-modal-box__footer {
+.docker-search .pf-v6-c-modal-box__footer {
     display: initial;
 }
 
-.podman-search .pf-v6-c-data-list {
+.docker-search .pf-v6-c-data-list {
     overflow-y: auto;
 }
 
-.podman-search .pf-v6-l-flex .pf-v6-c-form__group:nth-child(2) {
+.docker-search .pf-v6-l-flex .pf-v6-c-form__group:nth-child(2) {
     grid-template-columns: 2rem var(--pf-v6-c-form--m-horizontal__group-control--md--GridColumnWidth);
 }

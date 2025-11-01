@@ -5,7 +5,7 @@ cd "${0%/*}/../.."
 
 # HACK: ensure that critical components are up to date: https://github.com/psss/tmt/issues/682
 if [ ! -e /sysroot/ostree ]; then
-    dnf update -y podman crun conmon criu
+    dnf update -y docker crun conmon criu
 fi
 
 # if we run during cross-project testing against our main-builds COPR, then let that win
@@ -13,11 +13,11 @@ fi
 main_builds_repo="$(ls /etc/yum.repos.d/*cockpit*main-builds* 2>/dev/null || true)"
 if [ -n "$main_builds_repo" ]; then
     echo 'priority=0' >> "$main_builds_repo"
-    dnf distro-sync -y --repo 'copr*' cockpit-podman
+    dnf distro-sync -y --repo 'copr*' cockpit-docker
 fi
 
 # Show critical package versions
-rpm -q runc crun podman criu passt catatonit kernel-core selinux-policy cockpit-podman cockpit-bridge || true
+rpm -q runc crun docker criu passt catatonit kernel-core selinux-policy cockpit-docker cockpit-bridge || true
 
 # Show network information, for pasta debugging
 ip address show
@@ -50,12 +50,12 @@ su -c 'echo foobar | sudo --stdin whoami' - admin
 echo core > /proc/sys/kernel/core_pattern
 
 # grab a few images to play with; tests run offline, so they cannot download images
-podman rmi --all
+docker rmi --all
 
 # set up our expected images, in the same way that we do for upstream CI
 # this sometimes runs into network issues, so retry a few times
 for retry in $(seq 5); do
-    if curl https://raw.githubusercontent.com/cockpit-project/bots/main/images/scripts/lib/podman-images.setup | sh -eux; then
+    if curl https://raw.githubusercontent.com/cockpit-project/bots/main/images/scripts/lib/docker-images.setup | sh -eux; then
         break
     fi
     sleep $((5 * retry * retry))
@@ -65,9 +65,9 @@ CONTAINER="$(cat .cockpit-ci/container)"
 
 # import the test CONTAINER image as a directory tree for nspawn
 mkdir /var/tmp/tasks
-podman export "$(podman create --name tasks-import $CONTAINER)" | tar -x -C /var/tmp/tasks
-podman rm tasks-import
-podman rmi $CONTAINER
+docker export "$(docker create --name tasks-import $CONTAINER)" | tar -x -C /var/tmp/tasks
+docker rm tasks-import
+docker rmi $CONTAINER
 
 # image setup, shared with upstream tests
 sh -x test/vm.install

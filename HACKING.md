@@ -1,6 +1,6 @@
-# Hacking on Cockpit Podman
+# Hacking on Cockpit Docker
 
-The commands here assume you're in the top level of the Cockpit Podman git
+The commands here assume you're in the top level of the Cockpit Docker git
 repository checkout.
 
 ## Running out of git checkout
@@ -12,7 +12,7 @@ manually:
 
 ```
 mkdir -p ~/.local/share/cockpit
-ln -s `pwd`/dist ~/.local/share/cockpit/podman
+ln -s `pwd`/dist ~/.local/share/cockpit/docker
 ```
 
 After changing the code and running `make` again, reload the Cockpit page in
@@ -38,7 +38,7 @@ set to upload code changes to `~/.local/share/cockpit/` instead of
 
 ## Running eslint
 
-Cockpit Podman uses [ESLint](https://eslint.org/) to automatically check
+Cockpit Docker uses [ESLint](https://eslint.org/) to automatically check
 JavaScript code style in `.jsx` and `.js` files.
 
 eslint is executed as part of `test/static-code`, aka. `make codecheck`.
@@ -109,7 +109,7 @@ interacting with the test VM, and more.
 # Running tests against a Cockpit pull request
 
 The Cockpit testing infrastructure does not support testing a Cockpit pull
-request against a cockpit-podman pull request directly, but this can be
+request against a cockpit-docker pull request directly, but this can be
 achieved by using the packit copr build from the Cockpit pull request:
 
     ./bots/tests-trigger fedora-42/copr/packit/cockpit-project-cockpit-$prid

@@ -1,10 +1,10 @@
-# #-#-#-#-#  podman.js.pot (PACKAGE VERSION)  #-#-#-#-#
+# #-#-#-#-#  docker.js.pot (PACKAGE VERSION)  #-#-#-#-#
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
-# #-#-#-#-#  podman.metainfo.pot (PACKAGE VERSION)  #-#-#-#-#
+# #-#-#-#-#  docker.metainfo.pot (PACKAGE VERSION)  #-#-#-#-#
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
@@ -18,7 +18,7 @@ msgstr ""
 "PO-Revision-Date: 2025-07-31 06:53+0000\n"
 "Last-Translator: hsu zangmen <chzang55@gmail.com>\n"
 "Language-Team: Chinese (Traditional Han script) <https://translate."
-"fedoraproject.org/projects/cockpit/cockpit-podman/zh_Hant/>\n"
+"fedoraproject.org/projects/cockpit/cockpit-docker/zh_Hant/>\n"
 "Language: zh_Hant\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -151,13 +151,13 @@ msgstr "按一下以查看已發布使用的通訊埠"
 msgid "Click to see volumes"
 msgstr "點擊查看分區(卷)"
 
-#: org.cockpit_project.podman.metainfo.xml:22
+#: org.cockpit_project.docker.metainfo.xml:22
 msgid "Cockpit Project"
 msgstr "Cockpit 專案"
 
-#: org.cockpit_project.podman.metainfo.xml:6
-msgid "Cockpit component for Podman containers"
-msgstr "Podman 容器的 Cockpit 元件"
+#: org.cockpit_project.docker.metainfo.xml:6
+msgid "Cockpit component for Docker containers"
+msgstr "Docker 容器的 Cockpit 元件"
 
 #: src/ContainerDetails.jsx:43 src/ContainerCommitModal.jsx:116
 #: src/ContainerHealthLogs.jsx:63 src/ImageRunModal.jsx:927
@@ -935,17 +935,17 @@ msgstr "Pod 建立己失敗"
 msgid "Pod name"
 msgstr "Pod 名稱"
 
-#: org.cockpit_project.podman.metainfo.xml:5
-msgid "Podman"
-msgstr "Podman"
+#: org.cockpit_project.docker.metainfo.xml:5
+msgid "Docker"
+msgstr "Docker"
 
 #: src/manifest.json:0
-msgid "Podman containers"
-msgstr "Podman 容器"
+msgid "Docker containers"
+msgstr "Docker 容器"
 
 #: src/app.jsx:854
-msgid "Podman service failed"
-msgstr "Podman 服務啟動失敗"
+msgid "Docker service failed"
+msgstr "Docker 服務啟動失敗"
 
 #: src/PodCreateModal.jsx:184 src/ImageRunModal.jsx:1047
 msgid "Port mapping"
@@ -1213,14 +1213,14 @@ msgstr "標籤"
 msgid "Tags"
 msgstr "標籤"
 
-#: org.cockpit_project.podman.metainfo.xml:10
+#: org.cockpit_project.docker.metainfo.xml:10
 msgid ""
-"The Cockpit user interface for Podman containers. podman (Pod Manager) is a "
+"The Cockpit user interface for Docker containers. docker (Pod Manager) is a "
 "fully featured daemon-less engine for OCI containers, pods (groups of "
 "containers), and container images. It is CLI, API, and functionally "
 "compatible with Docker."
 msgstr ""
-"Podman (Pod Manager) 是一個功能完整的無守護進程程式引擎，適用於 OCI 容器、"
+"Docker (Pod Manager) 是一個功能完整的無守護進程程式引擎，適用於 OCI 容器、"
 "pod (容器群組) 和容器映像檔。 它與 Docker 兼容 CLI、API 及功能。"
 
 #: src/ImageRunModal.jsx:1137
@@ -1353,8 +1353,8 @@ msgid "pod"
 msgstr "pod"
 
 #: src/manifest.json:0
-msgid "podman"
-msgstr "podman"
+msgid "docker"
+msgstr "docker"
 
 #: src/Containers.jsx:585
 msgid "ports"

@@ -90,8 +90,8 @@ export const renderContainerVolumes = (volumes) => {
 };
 
 const ContainerEnv = ({ containerEnv, imageEnv }) => {
-    // filter out some Environment variables set by podman or by image
-    const toRemoveEnv = [...imageEnv, 'container=podman'];
+    // filter out some Environment variables set by docker or by image
+    const toRemoveEnv = [...imageEnv, 'container=docker'];
     let toShow = containerEnv.filter(variable => {
         if (toRemoveEnv.includes(variable)) {
             return false;
@@ -140,7 +140,7 @@ const ContainerIntegration = ({ container, localImages }) => {
 
     const image = localImages.filter(img => img.Id === container.Image)[0];
     let env = null;
-    // Podman allows one to remove an image while it has a container attached
+    // Docker allows one to remove an image while it has a container attached
     if (image)
         env = <ContainerEnv containerEnv={container.Config.Env} imageEnv={image.Env} />;
 

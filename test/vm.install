@@ -1,5 +1,5 @@
 #!/bin/sh
-# image-customize script to prepare a bots VM for cockpit-podman testing
+# image-customize script to prepare a bots VM for cockpit-docker testing
 # This part applies to any scenario, cockpit-ws package or cockpit/ws container with beiboot
 set -eu
 
@@ -18,25 +18,25 @@ if systemctl is-active -q firewalld.service; then
 fi
 
 # Remove extra images, tests assume our specific set
-# Since 4.0 podman now ships the pause image
-podman images --format '{{.Repository}}:{{.Tag}}' | grep -Ev 'localhost/test-|pause|cockpit/ws' | xargs -r podman rmi -f
+# Since 4.0 docker now ships the pause image
+docker images --format '{{.Repository}}:{{.Tag}}' | grep -Ev 'localhost/test-|pause|cockpit/ws' | xargs -r docker rmi -f
 
 # clean up cockpit/ws on Fedora images, as it "breaks" pixel tests; it's only relevant for OSTree images and rhel-8 beiboot
 if grep -q '^ID=.*fedora' /usr/lib/os-release && ! bootc status --booted; then
-    podman rmi -f quay.io/cockpit/ws || true
+    docker rmi -f quay.io/cockpit/ws || true
 fi
 
-# tests reset podman, save the images
+# tests reset docker, save the images
 mkdir -p /var/lib/test-images
-for img in $(podman images --format '{{.Repository}}:{{.Tag}}'); do
+for img in $(docker images --format '{{.Repository}}:{{.Tag}}'); do
     fname="$(echo "$img" | tr -dc '[a-zA-Z-]')"
-    podman save -o "/var/lib/test-images/${fname}.tar" "$img"
+    docker save -o "/var/lib/test-images/${fname}.tar" "$img"
 done
 
 # mitigate stupid/broken 90s timeout for user quadlet units
-# https://github.com/containers/podman/issues/22197#issuecomment-2728794702
-mkdir -p /etc/systemd/user/podman-user-wait-network-online.service.d
-printf '[Service]\nExecStart=\nExecStart=/bin/true\n' > /etc/systemd/user/podman-user-wait-network-online.service.d/disable.conf
+# https://github.com/containers/docker/issues/22197#issuecomment-2728794702
+mkdir -p /etc/systemd/user/docker-user-wait-network-online.service.d
+printf '[Service]\nExecStart=\nExecStart=/bin/true\n' > /etc/systemd/user/docker-user-wait-network-online.service.d/disable.conf
 
 # HACK: unbreak subuid assignment for current and new users; see
 # https://bugzilla.redhat.com/show_bug.cgi?id=2382662

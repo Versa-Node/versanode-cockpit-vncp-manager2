@@ -1,4 +1,4 @@
-# #-#-#-#-#  podman.js.pot (PACKAGE VERSION)  #-#-#-#-#
+# #-#-#-#-#  docker.js.pot (PACKAGE VERSION)  #-#-#-#-#
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
@@ -12,7 +12,7 @@ msgstr ""
 "PO-Revision-Date: 2025-09-04 08:53+0000\n"
 "Last-Translator: Ricky Tigg <ricky.tigg@gmail.com>\n"
 "Language-Team: Finnish <https://translate.fedoraproject.org/projects/cockpit/"
-"cockpit-podman/fi/>\n"
+"cockpit-docker/fi/>\n"
 "Language: fi\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -149,13 +149,13 @@ msgstr "Napsauta nähdäksesi julkaistut portit"
 msgid "Click to see volumes"
 msgstr "Napsauta nähdäksesi taltiot"
 
-#: org.cockpit_project.podman.metainfo.xml:22
+#: org.cockpit_project.docker.metainfo.xml:22
 msgid "Cockpit Project"
 msgstr "Cockpit-projekti"
 
-#: org.cockpit_project.podman.metainfo.xml:6
-msgid "Cockpit component for Podman containers"
-msgstr "Cockpit-komponentti Podman-konteille"
+#: org.cockpit_project.docker.metainfo.xml:6
+msgid "Cockpit component for Docker containers"
+msgstr "Cockpit-komponentti Docker-konteille"
 
 #: src/ContainerDetails.jsx:43 src/ContainerCommitModal.jsx:116
 #: src/ContainerHealthLogs.jsx:63 src/ImageRunModal.jsx:927
@@ -944,17 +944,17 @@ msgstr "Podin luonti epäonnistui"
 msgid "Pod name"
 msgstr "Podin nimi"
 
-#: org.cockpit_project.podman.metainfo.xml:5
-msgid "Podman"
-msgstr "Podman"
+#: org.cockpit_project.docker.metainfo.xml:5
+msgid "Docker"
+msgstr "Docker"
 
 #: src/manifest.json:0
-msgid "Podman containers"
-msgstr "Podman-kontit"
+msgid "Docker containers"
+msgstr "Docker-kontit"
 
 #: src/app.jsx:854
-msgid "Podman service failed"
-msgstr "Podman-palvelu epäonnistui"
+msgid "Docker service failed"
+msgstr "Docker-palvelu epäonnistui"
 
 #: src/PodCreateModal.jsx:184 src/ImageRunModal.jsx:1047
 msgid "Port mapping"
@@ -1224,14 +1224,14 @@ msgstr "Tunniste"
 msgid "Tags"
 msgstr "Tunnisteet"
 
-#: org.cockpit_project.podman.metainfo.xml:10
+#: org.cockpit_project.docker.metainfo.xml:10
 msgid ""
-"The Cockpit user interface for Podman containers. podman (Pod Manager) is a "
+"The Cockpit user interface for Docker containers. docker (Pod Manager) is a "
 "fully featured daemon-less engine for OCI containers, pods (groups of "
 "containers), and container images. It is CLI, API, and functionally "
 "compatible with Docker."
 msgstr ""
-"Cockpit-käyttöliittymä Podman-konteille. podman (Pod Manager) on täysin "
+"Cockpit-käyttöliittymä Docker-konteille. docker (Pod Manager) on täysin "
 "varusteltu demoniton moottori OCI-konteille, podille (konttiryhmille) ja "
 "konttikuville. Se on CLI, API ja toiminnallisesti yhteensopiva Dockerin "
 "kanssa."
@@ -1370,8 +1370,8 @@ msgid "pod"
 msgstr "podi"
 
 #: src/manifest.json:0
-msgid "podman"
-msgstr "podman"
+msgid "docker"
+msgstr "docker"
 
 #: src/Containers.jsx:585
 msgid "ports"
@@ -1424,20 +1424,20 @@ msgstr "taltiot"
 #~ msgid "Delete unused user images:"
 #~ msgstr "Poista käyttämättömät käyttäjän levykuvat:"
 
-#~ msgid "Automatically start podman on boot"
-#~ msgstr "Käynnistä podman automaattisesti käynnistyksen yhteydessä"
+#~ msgid "Automatically start docker on boot"
+#~ msgstr "Käynnistä docker automaattisesti käynnistyksen yhteydessä"
 
-#~ msgid "Start podman"
-#~ msgstr "Käynnistä podman"
+#~ msgid "Start docker"
+#~ msgstr "Käynnistä docker"
 
-#~ msgid "System Podman service is also available"
-#~ msgstr "Järjestelmän Podman-palvelu on myös saatavilla"
+#~ msgid "System Docker service is also available"
+#~ msgstr "Järjestelmän Docker-palvelu on myös saatavilla"
 
-#~ msgid "User Podman service is also available"
-#~ msgstr "Käyttäjän Podman-palvelu on myös saatavilla"
+#~ msgid "User Docker service is also available"
+#~ msgstr "Käyttäjän Docker-palvelu on myös saatavilla"
 
-#~ msgid "The Cockpit user interface for Podman containers."
-#~ msgstr "Cockpit-käyttöliittymä Podman-konteille."
+#~ msgid "The Cockpit user interface for Docker containers."
+#~ msgstr "Cockpit-käyttöliittymä Docker-konteille."
 
 #~ msgid "Delete $0"
 #~ msgstr "Poista $0"

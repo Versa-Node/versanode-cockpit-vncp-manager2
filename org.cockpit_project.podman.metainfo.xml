@@ -1,22 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <component type="addon">
-  <id>org.cockpit_project.podman</id>
+  <id>org.cockpit_project.docker</id>
   <metadata_license>CC0-1.0</metadata_license>
-  <name>Podman</name>
+  <name>Docker</name>
   <summary>
-    Cockpit component for Podman containers
+    Cockpit component for Docker containers
   </summary>
   <description>
     <p>
-      The Cockpit user interface for Podman containers.
+      The Cockpit user interface for Docker containers.
 
-      podman (Pod Manager) is a fully featured daemon-less engine for OCI
+      docker (Pod Manager) is a fully featured daemon-less engine for OCI
       containers, pods (groups of containers), and container images. It
       is CLI, API, and functionally compatible with Docker.
     </p>
   </description>
   <extends>org.cockpit_project.cockpit</extends>
-  <launchable type="cockpit-manifest">podman</launchable>
+  <launchable type="cockpit-manifest">docker</launchable>
   <url type="homepage">https://cockpit-project.org/</url>
   <developer id="org.cockpit-project">
     <name>Cockpit Project</name>

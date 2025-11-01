@@ -1,0 +1,139 @@
+@use "ct-card.scss";
+@use "page.scss";
+@use "global-variables" as *;
+// For pf-v6-line-clamp
+@use "@patternfly/patternfly/sass-utilities/mixins.scss";
+
+#app .pf-v6-c-card.containers-containers, #app .pf-v6-c-card.containers-images {
+    @extend .ct-card;
+}
+
+#containers-images, #containers-containers {
+    // Decrease padding for the image/container toggle button list
+    .pf-v6-c-table.pf-m-compact .pf-v6-c-table__toggle {
+        padding-inline-start: 0;
+    }
+
+    // don't make the columns too narrow
+    th .pf-v6-c-table__text {
+        min-inline-size: fit-content;
+    }
+}
+
+.container-block {
+    display: flex;
+    flex-direction: column;
+    word-break: break-all;
+}
+
+.container-block small {
+    @include pf-v6-line-clamp("1");
+    color: var(--pf-t--global--text--color--subtle);
+}
+
+.container-name {
+    font-size: var(--pf-t--global--font--size--lg);
+    font-weight: 400;
+}
+
+.containers-run-onbuildvarclaim input {
+    max-inline-size: 15em;
+}
+
+.pf-v6-c-alert__description {
+    overflow-wrap: anywhere;
+}
+
+.listing-action {
+    inline-size: 100%;
+    display: flex;
+    justify-content: space-around;
+}
+
+.pf-v6-c-form__label-text {
+    max-inline-size: max-content;
+}
+
+.delayed-crash-info {
+    display: flex;
+    flex-direction: column;
+    gap: var(--pf-t--global--spacer--md);
+}
+
+.memory-limit {
+    /* Prevent pushing layout to the right on systems with less memory or higher global font sizes */
+    min-inline-size: 4rem;
+}
+
+// Don't make the dropdown too long
+.containers-run-image-select .pf-v6-c-menu {
+    max-block-size: 20rem;
+    overflow: auto;
+}
+
+.containers-run-networking .pf-v6-c-form__label {
+    align-self: center;
+    padding-inline-end: var(--pf-t--global--spacer--md);
+}
+
+.healthcheck-table, .volumes-table, .networks-table {
+    .pf-v6-c-form__group .pf-v6-c-form__label {
+        padding-block-start: var(--pf-t--global--spacer--sm);
+    }
+
+    .pf-v6-c-form__group .pf-v6-c-form__group-control {
+        padding-block-start: 0;
+    }
+
+    .pf-v6-c-form-control + .pf-v6-c-form-control, .pf-v6-c-form-control + .pf-v6-c-form__group {
+        margin-block-start: var(--pf-t--global--spacer--sm);
+    }
+
+    .repeater-table {
+        .pf-v6-c-form__group {
+            padding-block: var(--pf-t--global--spacer--sm);
+        }
+    }
+
+    .dynamic-form-control {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: var(--pf-t--global--spacer--md);
+
+        button.pf-v6-c-button.pf-m-plain:last-of-type {
+            flex-shrink: 0;
+            align-self: center;
+            margin-block-start: var(--pf-t--global--spacer--xs);
+        }
+    }
+}
+
+// Use flex-start instead of stretch so the controls are not as tall as buttons
+.publish-port-form .pf-v6-c-form__group-control .pf-v6-c-input-group {
+    align-items: flex-start;
+}
+
+.publish-port-form .pf-v6-c-form__group-control .pf-v6-c-input-group .pf-v6-c-form-control {
+    min-block-size: auto;
+}
+
+.container-commit-modal .pf-v6-c-form__actions {
+    background-color: transparent;
+    margin-block-start: var(--pf-t--global--spacer--lg);
+    padding-block: 0;
+}
+
+.container-commit-modal .pf-v6-c-form .pf-v6-c-form__group:last-child {
+    margin-block-end: 0;
+}
+
+.progress-main {
+    display: flex;
+    flex-direction: column;
+    row-gap: var(--pf-t--global--spacer--md);
+}
+
+.progress-main .pf-v6-c-progress__status .pf-v6-c-progress__measure {
+    color: var(--pf-t--global--text--color--regular);
+}

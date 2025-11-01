@@ -3,12 +3,12 @@ on:
   schedule:
     # Run this every morning
     - cron: '45 2 * * *'
-  # can be run manually on https://github.com/cockpit-project/cockpit-podman/actions
+  # can be run manually on https://github.com/cockpit-project/cockpit-docker/actions
   workflow_dispatch:
 
 jobs:
   pot-upload:
-    environment: cockpit-podman-weblate
+    environment: cockpit-docker-weblate
     permissions:
       pull-requests: write
     runs-on: ubuntu-latest
@@ -24,7 +24,7 @@ jobs:
           path: src
 
       - name: Generate .pot file
-        run: make -C src po/podman.pot
+        run: make -C src po/docker.pot
 
       - name: Clone weblate repository
         uses: actions/checkout@v5
@@ -35,8 +35,8 @@ jobs:
 
       - name: Commit .pot to weblate repo
         run: |
-          cp src/po/podman.pot weblate/podman.pot
+          cp src/po/docker.pot weblate/docker.pot
           git config --global user.name "GitHub Workflow"
           git config --global user.email "cockpituous@cockpit-project.org"
-          git -C weblate commit -m "Update source file" -- podman.pot
+          git -C weblate commit -m "Update source file" -- docker.pot
           git -C weblate push

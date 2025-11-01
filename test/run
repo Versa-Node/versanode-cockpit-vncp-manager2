@@ -20,4 +20,4 @@ fi
 
 make codecheck
 make check
-make po/podman.pot
+make po/docker.pot

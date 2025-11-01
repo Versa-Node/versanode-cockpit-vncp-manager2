@@ -1,4 +1,4 @@
-cockpit-podman (VERSION-1) UNRELEASED; urgency=medium
+cockpit-docker (VERSION-1) UNRELEASED; urgency=medium
 
   * Upstream build
 

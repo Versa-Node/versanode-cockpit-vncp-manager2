@@ -1,11 +1,11 @@
-pkgname=cockpit-podman
+pkgname=cockpit-docker
 pkgver=VERSION
 pkgrel=1
-pkgdesc='Cockpit UI for podman containers'
+pkgdesc='Cockpit UI for docker containers'
 arch=('any')
-url='https://github.com/cockpit-project/cockpit-podman'
+url='https://github.com/cockpit-project/cockpit-docker'
 license=(LGPL)
-depends=(cockpit podman)
+depends=(cockpit docker)
 source=("SOURCE")
 sha256sums=('SKIP')
 

@@ -15,12 +15,12 @@
 # along with Cockpit; If not, see <http://www.gnu.org/licenses/>.
 #
 
-Name:           cockpit-podman
+Name:           cockpit-docker
 Version:        %{VERSION}
 Release:        1%{?dist}
-Summary:        Cockpit component for Podman containers
+Summary:        Cockpit component for Docker containers
 License:        LGPL-2.1-or-later
-URL:            https://github.com/cockpit-project/cockpit-podman
+URL:            https://github.com/cockpit-project/cockpit-docker
 
 Source0:        https://github.com/cockpit-project/%{name}/releases/download/%{version}/%{name}-%{version}.tar.xz
 BuildArch:      noarch
@@ -37,7 +37,7 @@ BuildRequires: libappstream-glib-devel
 %endif
 
 Requires:       cockpit-bridge
-Requires:       podman >= 2.0.4
+Requires:       docker >= 2.0.4
 # HACK https://github.com/containers/crun/issues/1091
 %if 0%{?centos} == 9
 Requires:       criu-libs
@@ -48,7 +48,7 @@ Requires:       libcriu2
 %{NPM_PROVIDES}
 
 %description
-The Cockpit user interface for Podman containers.
+The Cockpit user interface for Docker containers.
 
 %prep
 %setup -q -n %{name}

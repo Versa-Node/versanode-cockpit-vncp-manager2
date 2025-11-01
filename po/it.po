@@ -1,10 +1,10 @@
-# #-#-#-#-#  podman.js.pot (PACKAGE VERSION)  #-#-#-#-#
+# #-#-#-#-#  docker.js.pot (PACKAGE VERSION)  #-#-#-#-#
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
-# #-#-#-#-#  podman.metainfo.pot (PACKAGE VERSION)  #-#-#-#-#
+# #-#-#-#-#  docker.metainfo.pot (PACKAGE VERSION)  #-#-#-#-#
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
@@ -18,7 +18,7 @@ msgstr ""
 "PO-Revision-Date: 2025-06-08 14:11+0000\n"
 "Last-Translator: Salvatore Cocuzza <info@salvatorecocuzza.it>\n"
 "Language-Team: Italian <https://translate.fedoraproject.org/projects/cockpit/"
-"cockpit-podman/it/>\n"
+"cockpit-docker/it/>\n"
 "Language: it\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -157,13 +157,13 @@ msgstr "Fai clic per vedere le porte pubblicate"
 msgid "Click to see volumes"
 msgstr "Fai clic per vedere i volumi"
 
-#: org.cockpit_project.podman.metainfo.xml:22
+#: org.cockpit_project.docker.metainfo.xml:22
 msgid "Cockpit Project"
 msgstr "Progetto Cockpit"
 
-#: org.cockpit_project.podman.metainfo.xml:6
-msgid "Cockpit component for Podman containers"
-msgstr "Componente Cockpit per container Podman"
+#: org.cockpit_project.docker.metainfo.xml:6
+msgid "Cockpit component for Docker containers"
+msgstr "Componente Cockpit per container Docker"
 
 #: src/ContainerDetails.jsx:43 src/ContainerCommitModal.jsx:116
 #: src/ContainerHealthLogs.jsx:63 src/ImageRunModal.jsx:927
@@ -954,17 +954,17 @@ msgstr "Creazione del pod non riuscita"
 msgid "Pod name"
 msgstr "Nome pod"
 
-#: org.cockpit_project.podman.metainfo.xml:5
-msgid "Podman"
-msgstr "Podman"
+#: org.cockpit_project.docker.metainfo.xml:5
+msgid "Docker"
+msgstr "Docker"
 
 #: src/manifest.json:0
-msgid "Podman containers"
-msgstr "Container Podman"
+msgid "Docker containers"
+msgstr "Container Docker"
 
 #: src/app.jsx:854
-msgid "Podman service failed"
-msgstr "Servizio Podman non riuscito"
+msgid "Docker service failed"
+msgstr "Servizio Docker non riuscito"
 
 #: src/PodCreateModal.jsx:184 src/ImageRunModal.jsx:1047
 msgid "Port mapping"
@@ -1234,14 +1234,14 @@ msgstr "Tag"
 msgid "Tags"
 msgstr "Tag"
 
-#: org.cockpit_project.podman.metainfo.xml:10
+#: org.cockpit_project.docker.metainfo.xml:10
 msgid ""
-"The Cockpit user interface for Podman containers. podman (Pod Manager) is a "
+"The Cockpit user interface for Docker containers. docker (Pod Manager) is a "
 "fully featured daemon-less engine for OCI containers, pods (groups of "
 "containers), and container images. It is CLI, API, and functionally "
 "compatible with Docker."
 msgstr ""
-"L'interfaccia utente Cockpit per i container Podman. podman (Pod Manager) è "
+"L'interfaccia utente Cockpit per i container Docker. docker (Pod Manager) è "
 "un motore completo senza demone per container OCI, pod (gruppi di container) "
 "e immagini di container. È compatibile a livello di CLI, API e "
 "funzionalmente con Docker."
@@ -1380,8 +1380,8 @@ msgid "pod"
 msgstr "pod"
 
 #: src/manifest.json:0
-msgid "podman"
-msgstr "podman"
+msgid "docker"
+msgstr "docker"
 
 #: src/Containers.jsx:585
 msgid "ports"

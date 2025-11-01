@@ -27,7 +27,7 @@ ifeq ("$(TEST_SCENARIO)","ws-container")
 VM_CUSTOMIZE_FLAGS += --upload $(TARFILE):/var/tmp/ --script $(CURDIR)/test/vm-beiboot.install
 else ifneq (,$(or $(findstring coreos,$(TEST_OS)),$(findstring bootc,$(TEST_OS))))
 # HACK for ostree images: skip the rpm build/install
-VM_CUSTOMIZE_FLAGS += --run-command 'mkdir -p /usr/local/share/cockpit' --upload dist/:/usr/local/share/cockpit/podman
+VM_CUSTOMIZE_FLAGS += --run-command 'mkdir -p /usr/local/share/cockpit' --upload dist/:/usr/local/share/cockpit/docker
 else
 VM_CUSTOMIZE_FLAGS += --build $(TARFILE) --script $(CURDIR)/test/vm-ws-package.install
 endif

@@ -1,19 +1,19 @@
 #!/bin/sh
-# image-customize script to prepare a bots VM for cockpit-podman testing
+# image-customize script to prepare a bots VM for cockpit-docker testing
 # This part applies to cockpit/ws container with beibooting
 set -eu
 
 # back up original ws image
-podman save -o /var/tmp/cockpit-ws-original.tar quay.io/cockpit/ws:latest
+docker save -o /var/tmp/cockpit-ws-original.tar quay.io/cockpit/ws:latest
 
 # update ws container with our current code
 cd /var/tmp
-tar --strip-components=1 -xvf cockpit-podman*.tar.* cockpit-podman/dist
+tar --strip-components=1 -xvf cockpit-docker*.tar.* cockpit-docker/dist
 
-podman build -f - -t quay.io/cockpit/ws:latest . <<EOF
+docker build -f - -t quay.io/cockpit/ws:latest . <<EOF
 FROM quay.io/cockpit/ws
-RUN rm -rf /usr/share/cockpit/podman
-COPY dist /usr/share/cockpit/podman
+RUN rm -rf /usr/share/cockpit/docker
+COPY dist /usr/share/cockpit/docker
 EOF
 
 # remove preinstalled rpms

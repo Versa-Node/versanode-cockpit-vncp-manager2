@@ -8,8 +8,8 @@ assignees: ''
 ---
 
 Cockpit version: xxx
-Cockpit-podman version: xxx
-Podman version: xxx
+Cockpit-docker version: xxx
+Docker version: xxx
 OS:
 
 <!--- Issue description -->
@@ -19,7 +19,7 @@ Please help us out by explaining how to reproduce it.
 
 Relevant parts of the system log are also useful:
 `journalctl --since -10m` if the issue happened in the last 10 minutes
-`journalctl -u podman` or `journalctl --user -u podman` depending on the logged in user in cockpit.
+`journalctl -u docker` or `journalctl --user -u docker` depending on the logged in user in cockpit.
 -->
 
 Steps to reproduce
