@@ -1,0 +1,12 @@
+{
+    "tools": {
+        "index": {
+            "label": "Diagnostic reports",
+            "keywords": [
+                {
+                    "matches": ["sos"]
+                }
+            ]
+        }
+    }
+}

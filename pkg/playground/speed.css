@@ -1,0 +1,5 @@
+#spawn-output {
+  min-inline-size: 70ex;
+  min-block-size: 1rem;
+  max-block-size: 20rem;
+}

@@ -1,0 +1,6 @@
+# false positive: this *is* the source
+cockpit source: source-is-missing *pkg/static/login.html*
+cockpit source: source-is-missing *src/cockpit/data/fail.html*
+cockpit source: source-is-missing *src/common/fail.html*
+# dist/ is (pre-)built from pkg/ and node_modules, see ./build.js
+cockpit source: source-is-missing *dist/*

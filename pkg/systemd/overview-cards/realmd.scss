@@ -1,0 +1,13 @@
+.realms-op-diagnostics {
+  max-block-size: 200px;
+}
+
+.realms-op-wait-message {
+  margin-inline-start: 10px;
+  float: inline-end;
+  margin-block-start: 3px;
+}
+
+#realms-leave-dialog .pf-v6-c-expandable-section {
+  margin-block-start: var(--pf-t--global--spacer--md);
+}

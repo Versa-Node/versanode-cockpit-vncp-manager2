@@ -1,0 +1,43 @@
+/*
+ * This file is part of Cockpit.
+ *
+ * Copyright (C) 2016 Red Hat, Inc.
+ *
+ * Cockpit is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation; either version 2.1 of the License, or
+ * (at your option) any later version.
+ *
+ * Cockpit is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with Cockpit; If not, see <https://www.gnu.org/licenses/>.
+ */
+
+@use "page";
+
+@use "global-variables" as *;
+@use "@patternfly/patternfly/utilities/Text/text.scss";
+@use "@patternfly/patternfly/utilities/Spacing/spacing.scss";
+
+#kdump-settings-location {
+  inline-size: 100%;
+}
+
+// error details
+#kdump-settings-dialog .pf-v6-c-code-block__pre {
+  max-block-size: 200px;
+  overflow-y: auto;
+}
+
+// use same spacing as spacing between card title and switch
+.pf-v6-c-switch {
+  --pf-v6-c-switch--ColumnGap: var(--pf-t--global--spacer--md);
+}
+
+.subtle-helper-text .pf-v6-c-helper-text__item-text {
+  color: var(--pf-t--global--text--color--subtle);
+}

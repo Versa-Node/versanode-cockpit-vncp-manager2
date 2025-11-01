@@ -34,8 +34,6 @@ import ContainerRestoreModal from './ContainerRestoreModal.jsx';
 import ContainerTerminal from './ContainerTerminal.jsx';
 import ForceRemoveModal from './ForceRemoveModal.jsx';
 import { ImageRunModal } from './ImageRunModal.jsx';
-import { PodActions } from './PodActions.jsx';
-import { PodCreateModal } from './PodCreateModal.jsx';
 import PruneUnusedContainersModal from './PruneUnusedContainersModal.jsx';
 import * as client from './client.js';
 import * as utils from './util.js';
@@ -685,8 +683,8 @@ class Containers extends React.Component {
         /** @type Record<string, string[]> */
         const partitionedContainers = { 'no-pod': [] };
         const unusedContainers = [];
-        const isLoaded = this.props.containers !== null && this.props.pods !== null && this.props.quadletContainers !== null && this.props.quadletPods !== null;
-        let pods;
+        // Docker version: simplified loading check without pods
+        const isLoaded = this.props.containers !== null && this.props.quadletContainers !== null;
 
         let emptyCaption = _("No containers");
         const emptyCaptionPod = _("No containers in this pod");
@@ -699,61 +697,28 @@ class Containers extends React.Component {
 
         if (isLoaded) {
             const filtered = this.filterContainers(this.props.containers);
-            pods = { ...this.props.pods };
-            /**
-             * Mapping of systemd service name to pod ID.
-             * @type Record<string, string>
-             **/
-            const podServiceNameIdMap = {};
-
-            Object.values(this.props.pods).forEach(pod => {
-                const service_name = pod?.Labels?.PODMAN_SYSTEMD_UNIT;
-                if (service_name) {
-                    const key = utils.makeKey(pod.uid, service_name);
-                    podServiceNameIdMap[key] = utils.makeKey(pod.uid, pod.Id);
-                }
-            });
-
-            // Add inactive quadlet pods to the `pods` state
-            Object.keys(this.props.quadletPods).forEach(key => {
-                const values = this.props.quadletPods[key];
-                if (!(utils.makeKey(values.uid, values.Labels.PODMAN_SYSTEMD_UNIT) in podServiceNameIdMap)) {
-                    pods[key] = values;
-                }
-            });
-
-            Object.keys(pods).forEach(pod => { partitionedContainers[pod] = [] });
-
+            
+            // Docker version: simplified container processing without pod logic
             // Set of running quadlets ($id-$name.service)
             const running_quadlets = new Set();
             filtered.forEach(id => {
                 const container = this.props.containers[id];
                 if (container) {
-                    (partitionedContainers[container.Pod ? utils.makeKey(container.uid, container.Pod) : 'no-pod'] || []).push(container);
+                    // Docker containers always go to 'no-pod' section
+                    partitionedContainers['no-pod'].push(container);
                     const service_name = container?.Config?.Labels?.PODMAN_SYSTEMD_UNIT;
                     if (service_name)
                         running_quadlets.add(utils.makeKey(container.uid, service_name));
                 }
             });
 
-            // Combine the docker containers with inactive quadlets, active
-            // quadlets have a running container or pod associated with them
+            // Docker version: Combine with inactive quadlets (simplified - no pod logic)
             const filteredQuadlets = this.filterContainers(this.props.quadletContainers);
             filteredQuadlets.forEach(id => {
                 if (!running_quadlets.has(id)) {
                     const cont = this.props.quadletContainers[id];
-                    const podKey = utils.makeKey(cont.uid, cont.Pod);
-                    // Quadlet container with a pod
-                    if (cont.Pod && !(podKey in podServiceNameIdMap)) {
-                        // Containers and pod state aren't updated in sync
-                        if (podKey in partitionedContainers)
-                            partitionedContainers[podKey].push(cont);
-                    // Stopped container but pod is running, find the pod ID via our mapping
-                    } else if (cont.Pod && podKey in podServiceNameIdMap) {
-                        partitionedContainers[podServiceNameIdMap[podKey]].push(cont);
-                    } else {
-                        partitionedContainers['no-pod'].push(cont);
-                    }
+                    // Docker containers always go to 'no-pod' section (no pod support)
+                    partitionedContainers['no-pod'].push(cont);
                 }
             });
 
@@ -762,24 +727,8 @@ class Containers extends React.Component {
                 partitionedContainers['no-pod'].push(cont);
             });
 
-            // Apply filters to pods
-            Object.keys(partitionedContainers).forEach(section => {
-                const lcf = this.props.textFilter.toLowerCase();
-                if (section != "no-pod") {
-                    const pod = pods[section];
-                    if ((this.props.filter == "running" && pod.Status != "Running") ||
-                        // If nor the pod name nor any container inside the pod fit the filter, hide the whole pod
-                        (!partitionedContainers[section].length && (pod.Name.toLowerCase().indexOf(lcf) < 0 ||
-                          pod.Labels?.PODMAN_SYSTEMD_UNIT?.toLowerCase().indexOf(lcf) < 0)) ||
-                        (this.props.ownerFilter !== "all" &&
-                         ((this.props.ownerFilter === "user" && pod.uid !== null) ||
-                            (this.props.ownerFilter !== "user" && pod.uid !== this.props.ownerFilter))))
-                        delete partitionedContainers[section];
-                }
-            });
-            // If there are pods to show and the generic container list is empty don't show  it at all
-            if (Object.keys(partitionedContainers).length > 1 && !partitionedContainers["no-pod"].length)
-                delete partitionedContainers["no-pod"];
+            // Docker version: simplified filtering (no pod logic needed)
+            // Since Docker only has 'no-pod' section, we don't need complex pod filtering
 
             const prune_states = ["created", "configured", "stopped", "exited"];
             for (const containerid of Object.keys(this.props.containers)) {
@@ -831,12 +780,6 @@ class Containers extends React.Component {
                     </utils.DockerInfoContext.Consumer>);
         };
 
-        const createPod = () => {
-            Dialogs.show(<PodCreateModal
-                users={this.props.users}
-                onAddNotification={this.props.onAddNotification} />);
-        };
-
         const filterRunning = (
             <Toolbar>
                 <ToolbarContent className="containers-containers-toolbarcontent">
@@ -850,13 +793,6 @@ class Containers extends React.Component {
                         </FormSelect>
                     </ToolbarItem>
                     <Divider orientation={{ default: "vertical" }} />
-                    <ToolbarItem>
-                        <Button variant="secondary" key="create-new-pod-action"
-                                id="containers-containers-create-pod-btn"
-                                onClick={() => createPod()}>
-                            {_("Create pod")}
-                        </Button>
-                    </ToolbarItem>
                     <ToolbarItem>
                         <Button variant="primary" key="get-new-image-action"
                                 id="containers-containers-create-container-btn"
@@ -911,72 +847,28 @@ class Containers extends React.Component {
                                             sortMethod={sortRows}
                                             rows={[]}
                                             sortBy={{ index: 0, direction: SortByDirection.asc }} />
-                            : Object.keys(partitionedContainers)
-                                    .sort((a, b) => {
-                                        if (a == "no-pod") return -1;
-                                        else if (b == "no-pod") return 1;
-
-                                        // User pods are in front of system ones
-                                        if (pods[a].uid !== pods[b].uid)
-                                            return pods[a].uid === 0 ? 1 : -1;
-                                        return pods[a].Name > pods[b].Name ? 1 : -1;
-                                    })
-                                    .map(section => {
-                                        const tableProps = {};
+                            : // Docker version: simplified rendering - only 'no-pod' section
+                              ['no-pod'].map(section => {
+                                        const tableProps = { 'aria-label': _("Containers") };
                                         const rows = partitionedContainers[section].map(container => {
                                             return this.renderRow(this.props.containersStats, container,
                                                                   localImages);
                                         });
-                                        let caption;
-                                        let podStatus;
-                                        let pod;
-                                        let isPodService = false;
-                                        let con;
-                                        if (section !== 'no-pod') {
-                                            pod = pods[section];
-                                            con = this.props.users.find(u => u.uid === pod.uid).con;
-                                            tableProps['aria-label'] = cockpit.format("Containers of pod $0", pod.Name);
-                                            podStatus = pod.Status;
-                                            isPodService = Boolean(pod.Labels?.PODMAN_SYSTEMD_UNIT);
-                                            caption = pod.Name;
-                                        } else {
-                                            tableProps['aria-label'] = _("Containers");
-                                        }
+                                        // Docker version: no pod-specific logic needed
+                                        const caption = null;
+                                        const podStatus = null;
+                                        const isPodService = false;
 
-                                        const actions = caption && (
-                                            <>
-                                                <Badge isRead className={"ct-badge-pod-" + podStatus.toLowerCase()}>{_(podStatus)}</Badge>
-                                                {!isPodService &&
-                                                <Button variant="secondary"
-                                                        className="create-container-in-pod"
-                                                        isDisabled={nonIntermediateImages === null}
-                                                        onClick={() => createContainer(this.props.pods[section])}>
-                                                    {_("Create container in pod")}
-                                                </Button>}
-                                                <PodActions con={con}
-                                                            onAddNotification={this.props.onAddNotification}
-                                                            pod={pod}
-                                                            isPodService={isPodService}
-                                                />
-                                            </>
-                                        );
+                                        // Docker version: no pod actions needed
+                                        const actions = null;
+                                        
                                         return (
                                             <Card key={'table-' + section}
-                                             id={'table-' + (section == "no-pod" ? section : pods[section].Name)}
-                                             isPlain={section == "no-pod"}
-                                             className="container-pod"
+                                             id={'table-' + section}
+                                             isPlain={true}
+                                             className="container-table"
                                              isClickable
                                              isSelectable>
-                                                {caption && <CardHeader actions={{ actions, className: "panel-actions" }}>
-                                                    <CardTitle>
-                                                        <Flex justifyContent={{ default: 'justifyContentFlexStart' }}>
-                                                            <h3 className='pod-name'>{caption}</h3>
-                                                            <span>{_("pod")}</span>
-                                                            {isPodService && <Badge className='ct-badge-service'>{_("service")}</Badge>}
-                                                            {this.renderPodDetails(pods[section], podStatus)}
-                                                        </Flex>
-                                                    </CardTitle>
-                                                </CardHeader>}
                                                 <ListingTable variant='compact'
                                                           emptyCaption={section == "no-pod" ? emptyCaption : emptyCaptionPod}
                                                           columns={columnTitles}
