@@ -62,6 +62,9 @@ class Application extends React.Component {
             serviceAvailable: null, // null = not checked yet, true/false = available or not
             images: null,
             containers: null,
+            pods: null,
+            quadletContainers: null,
+            quadletPods: null,
             containersLoaded: false,
             imagesLoaded: false,
             containersFilter: "all",
@@ -72,6 +75,7 @@ class Application extends React.Component {
             version: '1.3.0',
             selinuxAvailable: false,
             location: {},
+            users: [{ uid: 0, name: _("system") }], // Simplified single-user array
         };
         this.onAddNotification = this.onAddNotification.bind(this);
         this.onDismissNotification = this.onDismissNotification.bind(this);
@@ -598,18 +602,11 @@ class Application extends React.Component {
 
     componentWillUnmount() {
         cockpit.removeEventListener("locationchanged", this.onNavigate);
-
-        // Cleanup DBus subscriptions
-        this.state.users.forEach(user => {
-            if (user?.dbus) {
-                user.dbus?.subscription?.remove();
-                user.dbus?.client?.close();
-            }
-        });
+        // Simplified architecture - no multi-user cleanup needed
     }
 
     onNavigate() {
-        // HACK: Use usePageLocation when this is rewritten into a functional component
+        // Simplified navigation for single-user architecture
         const { options, path } = cockpit.location;
         this.setState({ location: options }, () => {
             // only use the root path
@@ -620,49 +617,10 @@ class Application extends React.Component {
                 if (options.container) {
                     this.onContainerFilterChanged(options.container);
                 }
-                if (["all", undefined].includes(options.owner)) {
-                    // disconnect all non-standard users
-                    this.setState(prevState => ({
-                        users: prevState.users.map(u => {
-                            if (u.uid !== 0 && u.uid !== null && u.con) {
-                                debug("onNavigate All: closing unused connection to", u.name);
-                                u.con.close();
-                                return { uid: u.uid, name: u.name, con: null };
-                            } else
-                                return u;
-                        }),
-                        ownerFilter: "all",
-                    }));
-                } else {
-                    const uid = options.owner === "user" ? null : parseInt(options.owner);
-                    const user = this.state.users.find(u => u.uid === uid);
-                    if (user) {
-                        // disconnect other non-standard users, to avoid piling up connections
-                        this.setState(prevState => ({
-                            users: prevState.users.map(u => {
-                                if (u.uid !== uid && u.uid !== 0 && u.uid !== null && u.con) {
-                                    debug("onNavigate", user.name, ": closing unused connection to", u.name);
-                                    u.con.close();
-                                    return { uid: u.uid, name: u.name, con: null };
-                                } else
-                                    return u;
-                            }),
-                            ownerFilter: uid === null ? "user" : uid,
-                        }), () => {
-                            if (user.con === null) {
-                                debug("onNavigate", user.name, ": initializing connection");
-                                this.init(user.uid, user.name);
-                            } else {
-                                debug("onNavigate", user.name, ": connection already initialized");
-                            }
-                        });
-                    } else {
-                        console.warn("Unknown user", options.owner, "in URL, ignoring");
-                        debug("known users:", JSON.stringify(this.state.users.map(u => [u.name, u.uid])));
-                        // reset URL to current value
-                        this.updateUrl({ ...this.state.location, owner: this.state.ownerFilter });
-                    }
-                }
+                // Simplified owner filter - just update state without complex user management
+                this.setState({
+                    ownerFilter: options.owner || "all"
+                });
             }
         });
     }
