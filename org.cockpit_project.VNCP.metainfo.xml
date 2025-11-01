@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="addon">
+  <id>org.cockpit_project.VNCP</id>
+  <metadata_license>CC0-1.0</metadata_license>
+  <name>VNCP Manager</name>
+  <summary>
+    Cockpit component for VNCP Docker container management
+  </summary>
+  <description>
+    <p>
+      The Cockpit user interface for VNCP Docker container management.
+
+      VNCP Manager provides a web-based interface for managing Docker
+      containers, images, and volumes through Cockpit. This is a Docker
+      version of the original Podman-based container management interface,
+      specifically adapted for VNCP (VersaNode Control Panel) environments.
+    </p>
+  </description>
+  <extends>org.cockpit_project.cockpit</extends>
+  <launchable type="cockpit-manifest">VNCP</launchable>
+  <url type="homepage">https://github.com/Versa-Node/versanode-cockpit-vncp-manager2</url>
+  <developer id="org.versa-node">
+    <name>Versa-Node</name>
+  </developer>
+</component>
