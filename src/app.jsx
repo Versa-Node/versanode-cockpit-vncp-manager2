@@ -616,7 +616,13 @@ class Application extends React.Component {
                 ];
                 await cockpit.spawn(socket_args, spawn_options);
             }
+            
+            // Connect to Docker daemon
+            console.debug("Attempting to connect to Docker daemon for uid:", uid);
             con = rest.connect(uid);
+            
+            // Test the connection with getInfo
+            console.debug("Testing Docker connection with getInfo...");
             const reply = await client.getInfo(con);
             this.setState(prevState => {
                 const users = prevState.users.filter(u => u.uid !== uid);

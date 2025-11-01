@@ -1,6 +1,16 @@
 {
     "conditions": [
-        {"path-exists": "/lib/systemd/system/docker.socket"}
+        {
+            "any": [
+                {"path-exists": "/lib/systemd/system/docker.socket"},
+                {"path-exists": "/usr/lib/systemd/system/docker.socket"},
+                {"path-exists": "/etc/systemd/system/docker.socket"},
+                {"path-exists": "/lib/systemd/system/docker.service"},
+                {"path-exists": "/usr/lib/systemd/system/docker.service"},
+                {"path-exists": "/etc/systemd/system/docker.service"},
+                {"path-exists": "/var/run/docker.sock"}
+            ]
+        }
     ],
     "menu": {
         "index": {

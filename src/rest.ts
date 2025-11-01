@@ -26,28 +26,40 @@ let call_id = 0;
 const NL = '\n'.charCodeAt(0); // always 10, but avoid magic constant
 const CR = '\r'.charCodeAt(0); // always 13, but avoid magic constant
 
-const DOCKER_SYSTEM_ADDRESS = "/lib/systemd/system/docker.socket";
+// Common Docker socket locations to try
+const DOCKER_SOCKET_PATHS = [
+    "/var/run/docker.sock",
+    "/run/docker.sock",
+    "/tmp/docker.sock"
+];
 
 export type Uid = number | null; // standard Unix UID or null for logged in session user
+
+function findDockerSocket(): string {
+    // For now, just return the most common Docker socket path
+    // Runtime detection will be handled by connection layer
+    return DOCKER_SOCKET_PATHS[0];
+}
 
 // FIXME: export SuperuserMode in cockpit.d.ts, and use it here
 function getAddress(uid: Uid): { path: string, superuser?: cockpit.ChannelOptions["superuser"] } {
     if (uid === null) {
-        // For user sessions, Docker typically runs as system service
-        // but we can try the user runtime directory first
+        // For user sessions, try user runtime directory first
         const xrd = sessionStorage.getItem('XDG_RUNTIME_DIR');
-        if (xrd)
-            return { path: xrd + "/docker/docker.sock" };
+        if (xrd) {
+            const userSocket = xrd + "/docker/docker.sock";
+            return { path: userSocket };
+        }
         // Fall back to system socket
         console.warn("$XDG_RUNTIME_DIR is not present. Using system Docker socket.");
-        return { path: DOCKER_SYSTEM_ADDRESS, superuser: "try" };
+        return { path: findDockerSocket(), superuser: "try" };
     }
 
     if (uid === 0)
-        return { path: DOCKER_SYSTEM_ADDRESS, superuser: "require" };
+        return { path: findDockerSocket(), superuser: "require" };
 
     if (Number.isInteger(uid))
-        return { path: DOCKER_SYSTEM_ADDRESS, superuser: "require" };
+        return { path: findDockerSocket(), superuser: "require" };
 
     throw new Error(`getAddress: uid ${uid} not supported`);
 }
@@ -81,6 +93,8 @@ export type Connection = {
 
 function connect(uid: Uid): Connection {
     const addr = getAddress(uid);
+    console.debug("Docker connection - uid:", uid, "socket path:", addr.path, "superuser:", addr.superuser);
+    
     /* This doesn't create a channel until a request */
     /* HACK: use binary channel to work around https://github.com/cockpit-project/cockpit/issues/19235 */
     const http = cockpit.http(addr.path, { superuser: addr.superuser, binary: true });
