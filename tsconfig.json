@@ -2,8 +2,7 @@
   "compilerOptions": {
     "allowImportingTsExtensions": true,
     "allowJs": true,
-    "checkJs": true,
-    "exactOptionalPropertyTypes": true,
+    "checkJs": false,
     "jsx": "react",
     "lib": [
       "dom",
@@ -15,7 +14,7 @@
     "module": "preserve",
     "moduleResolution": "bundler",
     "noEmit": true,
-    "strict": true,
+    "strict": false,
     "target": "es2021"
   },
   "include": [

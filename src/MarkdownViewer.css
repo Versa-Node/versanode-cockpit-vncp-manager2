@@ -1,0 +1,66 @@
+/* Markdown Viewer Styling */
+.markdown-viewer {
+    padding: 1rem;
+    line-height: 1.6;
+}
+
+.markdown-viewer h1,
+.markdown-viewer h2,
+.markdown-viewer h3,
+.markdown-viewer h4,
+.markdown-viewer h5,
+.markdown-viewer h6 {
+    margin-top: 1.5rem;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+}
+
+.markdown-viewer h1 {
+    font-size: 1.5rem;
+    border-bottom: 1px solid var(--pf-global--BorderColor--100);
+    padding-bottom: 0.3rem;
+}
+
+.markdown-viewer h2 {
+    font-size: 1.25rem;
+}
+
+.markdown-viewer p {
+    margin-bottom: 1rem;
+}
+
+.markdown-viewer ul,
+.markdown-viewer ol {
+    padding-left: 2rem;
+    margin-bottom: 1rem;
+}
+
+.markdown-viewer li {
+    margin-bottom: 0.25rem;
+}
+
+.markdown-viewer blockquote {
+    border-left: 4px solid var(--pf-global--BorderColor--200);
+    padding-left: 1rem;
+    margin: 1rem 0;
+    color: var(--pf-global--Color--200);
+}
+
+.markdown-viewer img {
+    max-width: 100%;
+    height: auto;
+}
+
+.markdown-viewer pre {
+    margin: 1rem 0;
+    overflow-x: auto;
+}
+
+/* PatternFly integration for tables */
+.markdown-viewer .pf-c-table {
+    margin: 1rem 0;
+}
+
+.markdown-viewer .pf-c-code-block {
+    margin: 1rem 0;
+}

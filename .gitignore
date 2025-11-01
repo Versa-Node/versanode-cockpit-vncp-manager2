@@ -29,6 +29,6 @@
 /packaging/debian/changelog
 /po/*.pot
  /po/LINGUAS
-/test/common/
+# /test/common/  # Allow committing essential build utilities
 /test/images/
 /test/static-code

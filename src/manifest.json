@@ -8,7 +8,7 @@
             "order": 50,
             "keywords": [
                 {
-                    "matches": ["docker", "container", "image"]
+                    "matches": ["vncp", "docker", "container", "image"]
                 }
             ]
         }
