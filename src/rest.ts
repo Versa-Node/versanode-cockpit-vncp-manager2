@@ -26,24 +26,12 @@ let call_id = 0;
 const NL = '\n'.charCodeAt(0); // always 10, but avoid magic constant
 const CR = '\r'.charCodeAt(0); // always 13, but avoid magic constant
 
-// Common Docker socket locations to try (in priority order)
-const DOCKER_SOCKET_PATHS = [
-    "/var/run/docker.sock", // Standard Docker
-    "/var/snap/docker/common/var-lib-docker.sock", // Snap Docker (common on Ubuntu)
-    "/run/docker.sock", // Alternative location
-    "/tmp/docker.sock", // Temporary location
-];
+// Simple Docker socket address - matches working repository approach
+const DOCKER_ADDRESS = "/var/run/docker.sock";
 
 export type Uid = number | null; // standard Unix UID or null for logged in session user
 
-function findDockerSocket(): string {
-    // For now, return most common path - detection will happen at connection time
-    // TODO: Add runtime socket detection when cockpit provides better file checking APIs
-    console.debug("Using Docker socket paths in priority order:", DOCKER_SOCKET_PATHS);
-    return DOCKER_SOCKET_PATHS[0];
-}
-
-// FIXME: export SuperuserMode in cockpit.d.ts, and use it here
+// Simple address function matching working repository approach
 function getAddress(uid: Uid): { path: string, superuser?: cockpit.ChannelOptions["superuser"] } {
     if (uid === null) {
         // For user sessions, try user runtime directory first
@@ -54,14 +42,14 @@ function getAddress(uid: Uid): { path: string, superuser?: cockpit.ChannelOption
         }
         // Fall back to system socket
         console.warn("$XDG_RUNTIME_DIR is not present. Using system Docker socket.");
-        return { path: findDockerSocket(), superuser: "try" };
+        return { path: DOCKER_ADDRESS, superuser: "try" };
     }
 
     if (uid === 0)
-        return { path: findDockerSocket(), superuser: "require" };
+        return { path: DOCKER_ADDRESS, superuser: "require" };
 
     if (Number.isInteger(uid))
-        return { path: findDockerSocket(), superuser: "require" };
+        return { path: DOCKER_ADDRESS, superuser: "require" };
 
     throw new Error(`getAddress: uid ${uid} not supported`);
 }
@@ -195,62 +183,6 @@ function connect(uid: Uid): Connection {
     return { uid, monitor, call, close };
 }
 
-// Try connecting with different socket paths for robustness
-function connectWithFallback(uid: Uid): Connection {
-    // First try the default path
-    const defaultAddr = getAddress(uid);
-    console.debug("Trying default Docker socket for uid:", uid, "path:", defaultAddr.path);
-    
-    // For now, return default connection - fallback logic will be in app layer
-    return connect(uid);
-}
-
-// Try multiple socket paths to find working Docker connection  
-function tryMultipleSocketPaths(uid: Uid): Promise<Connection | null> {
-    const superuser = uid === 0 ? "require" : uid === null ? "try" : "require";
-    
-    return new Promise((resolve) => {
-        let attempts = 0;
-        
-        function tryNextSocket() {
-            if (attempts >= DOCKER_SOCKET_PATHS.length) {
-                console.warn("All Docker socket paths failed for uid:", uid);
-                resolve(null);
-                return;
-            }
-            
-            const socketPath = DOCKER_SOCKET_PATHS[attempts];
-            console.debug(`Trying Docker socket ${attempts + 1}/${DOCKER_SOCKET_PATHS.length}:`, socketPath);
-            
-            try {
-                const http = cockpit.http(socketPath, { superuser, binary: true });
-                const testConnection = { uid, monitor: () => Promise.resolve(), call: () => Promise.resolve(""), close: () => http.close() };
-                
-                // Test with a simple version call
-                http.request({ method: "GET", path: "/version" })
-                    .then(() => {
-                        console.debug("Successfully connected to Docker at:", socketPath);
-                        // Create real connection with working path
-                        const workingConnection = connect(uid);
-                        resolve(workingConnection);
-                    })
-                    .catch(() => {
-                        attempts++;
-                        tryNextSocket();
-                    });
-            } catch {
-                attempts++;
-                tryNextSocket();
-            }
-        }
-        
-        tryNextSocket();
-    });
-}
-
 export default {
     connect,
-    connectWithFallback,
-    tryMultipleSocketPaths,
-    getAddress,
 };

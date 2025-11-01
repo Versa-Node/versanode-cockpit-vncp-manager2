@@ -849,6 +849,23 @@ class Application extends React.Component {
         this.setState({ userDockerRestartAvailable: out.trim() === "loaded" });
     }
 
+    startService(e) {
+        if (!e || e.button !== 0)
+            return;
+
+        // Simple docker.socket startup like working repository
+        cockpit.spawn(["systemctl", "start", "docker.socket"], { superuser: "require", err: "message" })
+                .then(() => {
+                    console.debug("Successfully started docker.socket");
+                    // Reinitialize connections after starting service
+                    this.initializeUsers();
+                })
+                .catch(err => {
+                    console.warn("Failed to start docker.socket:", JSON.stringify(err));
+                    this.onAddNotification({ type: 'danger', error: _("Failed to start Docker service"), errorDetail: err.message });
+                });
+    }
+
     goToServicePage(e) {
         if (!e || e.button !== 0)
             return;
@@ -861,10 +878,13 @@ class Application extends React.Component {
             return (
                 <Page className="pf-m-no-sidebar">
                     <PageSection hasBodyWrapper={false}>
-                        <EmptyState headingLevel="h2" icon={ExclamationCircleIcon} titleText={_("Docker service failed")} variant={EmptyStateVariant.full}>
+                        <EmptyState headingLevel="h2" icon={ExclamationCircleIcon} titleText={_("Docker service is not active")} variant={EmptyStateVariant.full}>
                             <EmptyStateFooter>
+                                <Button variant="primary" onClick={this.startService}>
+                                    {_("Start docker")}
+                                </Button>
                                 <EmptyStateActions>
-                                    <Button variant="primary" onClick={this.goToServicePage}>
+                                    <Button variant="link" onClick={this.goToServicePage}>
                                         {_("Troubleshoot")}
                                     </Button>
                                 </EmptyStateActions>
