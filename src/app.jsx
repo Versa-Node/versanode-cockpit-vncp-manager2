@@ -593,37 +593,66 @@ class Application extends React.Component {
         let con = null;
 
         try {
-            // Try to start Docker service - try both .service and .socket
-            const environ = is_other_user ? ["XDG_RUNTIME_DIR=/run/user/" + uid] : [];
-            const spawn_options = { superuser: uid === null ? null : "require", err: "message", environ };
-            
-            try {
-                const service_args = [
-                    ...(is_other_user ? ["runuser", "-u", username, "--"] : []),
-                    "systemctl",
-                    ...(system ? [] : ["--user"]),
-                    "start", "docker.service"
-                ];
-                await cockpit.spawn(service_args, spawn_options);
-            } catch (service_error) {
-                // If docker.service fails, try docker.socket
-                console.debug("docker.service failed, trying docker.socket:", service_error);
-                const socket_args = [
-                    ...(is_other_user ? ["runuser", "-u", username, "--"] : []),
-                    "systemctl",
-                    ...(system ? [] : ["--user"]),
-                    "start", "docker.socket"
-                ];
-                await cockpit.spawn(socket_args, spawn_options);
-            }
-            
-            // Connect to Docker daemon
+            // Connect to Docker daemon first to see if it's already running
             console.debug("Attempting to connect to Docker daemon for uid:", uid);
             con = rest.connect(uid);
             
             // Test the connection with getInfo
             console.debug("Testing Docker connection with getInfo...");
-            const reply = await client.getInfo(con);
+            let reply;
+            
+            try {
+                reply = await client.getInfo(con);
+                console.debug("Docker is already running, no need to start services");
+            } catch (connection_error) {
+                console.debug("Docker not accessible, trying to start services:", connection_error);
+                
+                // Only try to start services if Docker connection failed
+                const environ = is_other_user ? ["XDG_RUNTIME_DIR=/run/user/" + uid] : [];
+                const spawn_options = { superuser: uid === null ? null : "require", err: "message", environ };
+                
+                let service_started = false;
+                
+                // Try docker.service first
+                try {
+                    const service_args = [
+                        ...(is_other_user ? ["runuser", "-u", username, "--"] : []),
+                        "systemctl",
+                        ...(system ? [] : ["--user"]),
+                        "start", "docker.service"
+                    ];
+                    await cockpit.spawn(service_args, spawn_options);
+                    service_started = true;
+                    console.debug("Successfully started docker.service");
+                } catch (service_error) {
+                    console.debug("docker.service failed:", service_error);
+                    
+                    // Try docker.socket as fallback
+                    try {
+                        const socket_args = [
+                            ...(is_other_user ? ["runuser", "-u", username, "--"] : []),
+                            "systemctl",
+                            ...(system ? [] : ["--user"]),
+                            "start", "docker.socket"
+                        ];
+                        await cockpit.spawn(socket_args, spawn_options);
+                        service_started = true;
+                        console.debug("Successfully started docker.socket");
+                    } catch (socket_error) {
+                        console.debug("docker.socket also failed:", socket_error);
+                        // Continue anyway - Docker might be running without systemd
+                    }
+                }
+                
+                // Wait a moment for services to start if we started one
+                if (service_started) {
+                    await new Promise(resolve => setTimeout(resolve, 2000));
+                }
+                
+                // Try connection again after starting services
+                console.debug("Retrying Docker connection after service start...");
+                reply = await client.getInfo(con);
+            }
             this.setState(prevState => {
                 const users = prevState.users.filter(u => u.uid !== uid);
                 users.push({ con, uid, name: username, containersLoaded: false, podsLoaded: false, imagesLoaded: false, quadletsLoaded: false });
@@ -647,9 +676,11 @@ class Application extends React.Component {
 
         this.updateImages(con);
         this.initContainers(con);
-        this.initQuadlets(con);
+        // Skip quadlet initialization - not applicable for Docker (Podman-specific feature)
+        // this.initQuadlets(con);
         this.subscribeDaemonReload(con);
-        this.updatePods(con);
+        // Skip pod functionality - removed from Docker version
+        // this.updatePods(con);
 
         client.streamEvents(con, message => this.handleEvent(message, con))
                 .catch(e => console.error("uid", uid, "streamEvents failed:", JSON.stringify(e)))
